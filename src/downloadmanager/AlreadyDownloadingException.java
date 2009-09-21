@@ -11,7 +11,6 @@ class AlreadyDownloadingException extends Exception {
      * @param message The message of the exception.
      */
     public AlreadyDownloadingException(String message) {
-        super(message);
+	super(message);
     }
-
 }

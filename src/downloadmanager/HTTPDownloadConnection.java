@@ -11,17 +11,16 @@ public class HTTPDownloadConnection extends DownloadConnection {
      * @param URL The URL to the server.
      */
     public HTTPDownloadConnection(String URL) {
-        super(URL);
+	super(URL);
     }
 
     @Override
     public int[] getBytes(int position, int size) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void connect() throws UnableToConnectException {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

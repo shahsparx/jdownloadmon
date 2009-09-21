@@ -14,12 +14,11 @@ public class RemoveDownloadButton extends Button {
      * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
      */
     public RemoveDownloadButton(JButton button, DownloadManager downloadManager) {
-        super(button, downloadManager);
-    }
-    
-    @Override
-    public void push() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	super(button, downloadManager);
     }
 
+    @Override
+    public void push() {
+	throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

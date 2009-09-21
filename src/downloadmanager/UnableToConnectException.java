@@ -11,7 +11,6 @@ public class UnableToConnectException extends Exception {
      * @param message The error message of this exception.
      */
     public UnableToConnectException(String message) {
-        super(message);
+	super(message);
     }
-
 }

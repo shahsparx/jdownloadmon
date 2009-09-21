@@ -31,15 +31,15 @@ public class DownloadManager implements DownloadObserver {
      * Construct a download manager. Creates the gui and initializes lists.
      */
     public DownloadManager() {
-        mActiveList = new ArrayList<DownloadObject>();
-        mInactiveList = new ArrayList<DownloadObject>();
-        mPendingList = new ArrayList<DownloadObject>();
-        mCompletedList = new ArrayList<DownloadObject>();
-        mErrorList = new ArrayList<DownloadObject>();
-        mSelectedList = new ArrayList<DownloadObject>();
+	mActiveList = new ArrayList<DownloadObject>();
+	mInactiveList = new ArrayList<DownloadObject>();
+	mPendingList = new ArrayList<DownloadObject>();
+	mCompletedList = new ArrayList<DownloadObject>();
+	mErrorList = new ArrayList<DownloadObject>();
+	mSelectedList = new ArrayList<DownloadObject>();
 
-        DownloadQueue queue = new DownloadQueue();
-        mGUI = new GUI(queue);
+	DownloadQueue queue = new DownloadQueue();
+	mGUI = new GUI(queue);
     }
 
     /**
@@ -47,70 +47,75 @@ public class DownloadManager implements DownloadObserver {
      * Will not work if the max number of downloads is already reached.
      */
     public boolean addToActiveList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	if (mActiveList.size() >= MAX_DOWNLOADS) {
+	    return false;
+	}
+
+	mActiveList.add(downloadObject);
+	return true;
     }
 
     /**
      * Tries to add a download object to the inactive list.
      */
     public boolean addToInactiveList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Tries to add a download object to the pending list.
      */
     public boolean addToPendingList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Tries to add a download object to the completed list.
      */
     public boolean addToCompletedList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Tries to add a download object to the error list.
      */
     public boolean addToErrorList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Removes a download from the active list.
      */
     public void removeFromActiveList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Removes a download from the inactive list.
      */
     public void removeFromInactiveList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Removes a download from the pending list.
      */
     public void removeFromPendingList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Removes a download from the completed list.
      */
     public void removeFromCompletedList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Removes a download from the error list.
      */
     public void removeFromErrorList(DownloadObject downloadObject) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -118,7 +123,7 @@ public class DownloadManager implements DownloadObserver {
      * @return The list of selected downloads.
      */
     public ArrayList<DownloadObject> getSelectedList() {
-        return mSelectedList;
+	return mSelectedList;
     }
 
     /**
@@ -126,28 +131,26 @@ public class DownloadManager implements DownloadObserver {
      * @param URL The url at which the download is located.
      */
     public void addDownload(String URL) {
-
     }
 
     /**
      * Tries to start downloading all download objects in the selected list.
      */
     public void startDownloading() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * Tries to stop downloading all download objects in the selected list.
      */
     public void stopDownloading() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * @see DownloadObserver
      */
     public void downloadEventPerformed(DownloadEvent downloadEvent) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

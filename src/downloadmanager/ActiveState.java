@@ -11,12 +11,11 @@ public class ActiveState extends StatusState {
      * @param downloadObject The downloadObject associated with this state.
      */
     public ActiveState(DownloadObject downloadObject) {
-        super(downloadObject);
+	super(downloadObject);
     }
 
     @Override
     public void download() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

@@ -19,13 +19,12 @@ public class AddDownloadButton extends Button {
      * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
      */
     public AddDownloadButton(JButton button, DownloadManager downloadManager, AddDownloadBox addDownloadBox) {
-        super(button, downloadManager);
-        mAddDownloadBox = addDownloadBox;
+	super(button, downloadManager);
+	mAddDownloadBox = addDownloadBox;
     }
 
     @Override
     public void push() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

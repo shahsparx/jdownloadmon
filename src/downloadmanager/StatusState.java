@@ -14,7 +14,7 @@ public abstract class StatusState {
      * @param downloadObject The downloadObject associated with this state.
      */
     protected StatusState(DownloadObject downloadObject) {
-        mDownloadObject = downloadObject;
+	mDownloadObject = downloadObject;
     }
 
     /**
@@ -22,5 +22,4 @@ public abstract class StatusState {
      * For some states this will not start the download.
      */
     public abstract void download();
-
 }

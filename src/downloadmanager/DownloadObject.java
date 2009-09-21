@@ -28,35 +28,34 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @param connection The download connection to use for downloading.
      */
     public DownloadObject(String destination, DownloadConnection connection) {
-
     }
 
     /**
      * @see Runnable#run() 
      */
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * @see DownloadObservable#addListener(DownloadObserver observer)
      */
     public void addListener(DownloadObserver observer) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * @see DownloadObservable#removeListener(DownloadObserver observer)
      */
     public void removeListener(DownloadObserver observer) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
      * @see DownloadObservable#notifyListeners(DownloadEvent downloadEvent)
      */
     public void notifyListeners(DownloadEvent downloadEvent) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -64,7 +63,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @return the {@link StatusState} that this object is currently in.
      */
     public StatusState getStatusState() {
-        return mStatusState;
+	return mStatusState;
     }
 
     /**
@@ -72,7 +71,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @return an <tt>integer</tt> value representing how far this download has gotten percentually.
      */
     public int getPercentDownloaded() {
-        return 0;
+	return 0;
     }
 
     /**
@@ -80,7 +79,6 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @param state The StatusState to change to.
      */
     public void setState(StatusState state) {
-
     }
 
     /**
@@ -88,7 +86,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @return Destination file path, as a String.
      */
     public String getDestination() {
-        return mDestination;
+	return mDestination;
     }
 
     /**
@@ -97,11 +95,11 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @param newDestination The destination file path, as a String.
      */
     public void setDestination(String newDestination) throws AlreadyDownloadingException {
-        if (!(mStatusState instanceof ActiveState)) {
-        mDestination = newDestination;
-        } else {
-          throw new AlreadyDownloadingException("Cannot change destination, already downloading!");
-        }
+	if (!(mStatusState instanceof ActiveState)) {
+	    mDestination = newDestination;
+	} else {
+	    throw new AlreadyDownloadingException("Cannot change destination, already downloading!");
+	}
     }
 
     /**
@@ -109,7 +107,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @return The download connection of this download object.
      */
     public DownloadConnection getConnection() {
-        return mDownloadConnection;
+	return mDownloadConnection;
     }
 
     /**
@@ -118,17 +116,17 @@ public class DownloadObject implements Runnable, DownloadObservable {
      * @param downloadConnection The new connection to set to.
      */
     public void setConnection(DownloadConnection downloadConnection) throws AlreadyDownloadingException {
-        if (!(mStatusState instanceof ActiveState)) {
-             mDownloadConnection = downloadConnection;
-        } else {
-            throw new AlreadyDownloadingException("Cannot change connection, already downloading!");
-        }
+	if (!(mStatusState instanceof ActiveState)) {
+	    mDownloadConnection = downloadConnection;
+	} else {
+	    throw new AlreadyDownloadingException("Cannot change connection, already downloading!");
+	}
     }
 
     /**
      * Try to start the download of the download object.
      */
     public void download() {
-        mStatusState.download();
+	mStatusState.download();
     }
 }

@@ -11,5 +11,4 @@ public interface DownloadObserver {
      * @param downloadEvent The download event that was performed.
      */
     public void downloadEventPerformed(DownloadEvent downloadEvent);
-
 }

@@ -5,7 +5,7 @@ package downloadmanager;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public abstract class DownloadConnection {
-    
+
     /** The URL of the server this connection connects to. */
     protected String mURL;
 
@@ -14,7 +14,7 @@ public abstract class DownloadConnection {
      * @param URL The URL to connect to.
      */
     protected DownloadConnection(String URL) {
-        mURL = URL;
+	mURL = URL;
     }
 
     /**
@@ -22,7 +22,7 @@ public abstract class DownloadConnection {
      * @return The URL of this connection.
      */
     public String getURL() {
-        return mURL;
+	return mURL;
     }
 
     /**

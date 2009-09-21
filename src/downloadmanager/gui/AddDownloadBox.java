@@ -16,5 +16,4 @@ public class AddDownloadBox {
      */
     public AddDownloadBox() {
     }
-
 }

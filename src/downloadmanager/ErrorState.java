@@ -13,7 +13,7 @@ public class ErrorState extends StatusState {
      * @return The error message of this state.
      */
     public String getErrorMessage() {
-        return mErrorMessage;
+	return mErrorMessage;
     }
 
     /**
@@ -22,13 +22,12 @@ public class ErrorState extends StatusState {
      * @param errorMessage The error message of this state.
      */
     public ErrorState(DownloadObject downloadObject, String errorMessage) {
-        super(downloadObject);
-        mErrorMessage = errorMessage;
+	super(downloadObject);
+	mErrorMessage = errorMessage;
     }
 
     @Override
     public void download() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

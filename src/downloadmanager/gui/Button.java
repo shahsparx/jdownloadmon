@@ -13,15 +13,15 @@ public abstract class Button {
     protected JButton mButton;
     /** The Download Manager to perform actions on with this button. */
     protected DownloadManager mDownloadManager;
-    
+
     /**
      * Construct a button.
      * @param button The JButton used in this button.
      * @param downloadManager The download manager to perform actions on.
      */
     protected Button(JButton button, DownloadManager downloadManager) {
-        mButton = button;
-        mDownloadManager = downloadManager;
+	mButton = button;
+	mDownloadManager = downloadManager;
     }
 
     /**

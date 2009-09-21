@@ -14,12 +14,11 @@ public class MoveDownloadDownButton extends Button {
      * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
      */
     public MoveDownloadDownButton(JButton button, DownloadManager downloadManager) {
-        super(button, downloadManager);
+	super(button, downloadManager);
     }
 
     @Override
     public void push() {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

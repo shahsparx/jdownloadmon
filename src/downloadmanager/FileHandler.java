@@ -5,5 +5,4 @@ package downloadmanager;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class FileHandler {
-
 }

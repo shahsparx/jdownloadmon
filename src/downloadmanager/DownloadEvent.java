@@ -18,9 +18,9 @@ public class DownloadEvent {
      * @param downloadObject The download object asoociated with this event.
      */
     public DownloadEvent(DownloadObject downloadObject) {
-        mDownloadObject = downloadObject;
-        mPercentDownloaded = downloadObject.getPercentDownloaded();
-        mState = downloadObject.getStatusState();
+	mDownloadObject = downloadObject;
+	mPercentDownloaded = downloadObject.getPercentDownloaded();
+	mState = downloadObject.getStatusState();
     }
 
     /**
@@ -28,7 +28,7 @@ public class DownloadEvent {
      * @return The download object that this event is associated with.
      */
     public DownloadObject getDownloadObject() {
-        return mDownloadObject;
+	return mDownloadObject;
     }
 
     /**
@@ -36,7 +36,7 @@ public class DownloadEvent {
      * @return The percentage as an intger representing how much was downloaded at the time of this event's creation.
      */
     public int getPercentDownloaded() {
-        return mPercentDownloaded;
+	return mPercentDownloaded;
     }
 
     /**
@@ -44,6 +44,6 @@ public class DownloadEvent {
      * @return The state that was the state of the object when this event was created.
      */
     public StatusState getState() {
-        return mState;
+	return mState;
     }
 }

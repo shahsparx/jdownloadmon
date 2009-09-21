@@ -21,15 +21,15 @@ public class DownloadQueue implements DownloadObserver {
      * Construct a download queue.
      */
     public DownloadQueue() {
-        mDownloads = new ArrayList<DownloadObject>();
-        mProgressBars = new ArrayList<JProgressBar>();
+	mDownloads = new ArrayList<DownloadObject>();
+	mProgressBars = new ArrayList<JProgressBar>();
     }
 
     /**
      * @see DownloadObserver#downloadEventPerformed(DownloadEvent downloadEvent)
      */
     public void downloadEventPerformed(DownloadEvent downloadEvent) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -37,8 +37,7 @@ public class DownloadQueue implements DownloadObserver {
      * @param downloadObject The download object to add.
      */
     public void addDownload(DownloadObject downloadObject) {
-        mDownloads.add(downloadObject);
-        mProgressBars.add(new JProgressBar());
+	mDownloads.add(downloadObject);
+	mProgressBars.add(new JProgressBar());
     }
-
 }

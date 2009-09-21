@@ -23,5 +23,4 @@ public interface DownloadObservable {
      * @param dE The download event that was raised.
      */
     public void notifyListeners(DownloadEvent dE);
-
 }
