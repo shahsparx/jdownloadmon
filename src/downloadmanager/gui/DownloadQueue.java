@@ -3,6 +3,7 @@ package downloadmanager.gui;
 import downloadmanager.DownloadEvent;
 import java.util.ArrayList;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * A download queue for the gui to show the list of download objects.
@@ -12,12 +13,19 @@ public class DownloadQueue extends JTable {
 
 	/** The list of download views. */
 	private ArrayList<DownloadView> mDownloads;
+	/** The table model for this table */
+	DefaultTableModel mModel;
 
 	/**
 	 * Construct a download queue.
 	 */
-	public DownloadQueue() {
+	public DownloadQueue(DefaultTableModel model) {
+		super(model);
 		mDownloads = new ArrayList<DownloadView>();
+		mModel = model;
+		mModel.addColumn("File name");
+		mModel.addColumn("Progress");
+		getColumnModel().getColumn(1).setCellRenderer(new JProgressBarCell());
 	}
 
 	/**
@@ -26,6 +34,9 @@ public class DownloadQueue extends JTable {
 	 */
 	public void addDownload(DownloadView downloadView) {
 		mDownloads.add(downloadView);
+		Object[] rowData = { downloadView.getFileName() , downloadView.getProgressBar() };
+		mModel.addRow(rowData);
+		downloadView.getProgressBar();
 	}
 
 	/**

@@ -24,7 +24,7 @@ public class NewDownloadButton extends Button {
 
     @Override
     public void push() {
-		JFrame frame = new JFrame("New Download");
+		JFrame frame = new JFrame("New Download - jDownloadMon");
 		Container content = frame.getContentPane();
 		JPanel center = new JPanel();
 		center.setLayout(new FlowLayout());

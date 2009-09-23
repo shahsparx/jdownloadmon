@@ -8,7 +8,6 @@ import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 /**
  * The add download button is the button in the add download dialog box and is for

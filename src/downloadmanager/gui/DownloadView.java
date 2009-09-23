@@ -9,7 +9,7 @@ import javax.swing.JProgressBar;
  */
 public class DownloadView {
 
-	/** The download object wrapped in this download component. */
+	/** The download object wrapped in this download view. */
 	private DownloadObject mDownloadObject;
 	/** The progress bar for this download component. */
 	private JProgressBar mProgressBar;
@@ -28,5 +28,22 @@ public class DownloadView {
 	 */
 	public JProgressBar getProgressBar() {
 		return mProgressBar;
+	}
+
+	/**
+	 * Set the value of the progress bar.
+	 * @param percentage The percentage to set it to.
+	 */
+	public void setProgressBarValue(int percentage) {
+		mProgressBar.setValue(percentage);
+	}
+
+	/**
+	 * Get the file name of the download object.
+	 * @return The file name and extension of the download object as a <tt>String</tt>.
+	 */
+	public String getFileName() {
+		String[] strings = mDownloadObject.getDestination().split("/");
+		return strings[strings.length-1];
 	}
 }
