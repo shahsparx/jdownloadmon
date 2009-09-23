@@ -8,13 +8,21 @@ import javax.swing.JTextField;
  */
 public class AddDownloadBox {
 
-    /** The URL textfield in this Box. */
-    private JTextField mURLTextField;
+	/** The URL textfield in this Box. */
+	private JTextField mURLTextField;
 
-    /**
-     * Construct an add download dialog box.
-     */
-    public AddDownloadBox() {
-    }
+	/**
+	 * Construct an add download dialog box.
+	 */
+	public AddDownloadBox(JTextField field) {
+		mURLTextField = field;
+	}
 
+	/**
+	 * Get the URL textfield of this add download dialog box.
+	 * @return the URL textfield of this add download box.
+	 */
+	public JTextField getURLTextField() {
+		return mURLTextField;
+	}
 }

@@ -1,44 +1,37 @@
 package downloadmanager.gui;
 
 import downloadmanager.DownloadEvent;
-import downloadmanager.DownloadObject;
-import downloadmanager.DownloadObserver;
 import java.util.ArrayList;
-import javax.swing.JProgressBar;
+import javax.swing.JTable;
 
 /**
  * A download queue for the gui to show the list of download objects.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadQueue implements DownloadObserver {
+public class DownloadQueue extends JTable {
 
-    /** The list of download objects. */
-    private ArrayList<DownloadObject> mDownloads;
-    /** The list of progress bars. */
-    private ArrayList<JProgressBar> mProgressBars;
+	/** The list of download views. */
+	private ArrayList<DownloadView> mDownloads;
 
-    /**
-     * Construct a download queue.
-     */
-    public DownloadQueue() {
-        mDownloads = new ArrayList<DownloadObject>();
-        mProgressBars = new ArrayList<JProgressBar>();
-    }
+	/**
+	 * Construct a download queue.
+	 */
+	public DownloadQueue() {
+		mDownloads = new ArrayList<DownloadView>();
+	}
 
-    /**
-     * @see DownloadObserver#downloadEventPerformed(DownloadEvent downloadEvent)
-     */
-    public void downloadEventPerformed(DownloadEvent downloadEvent) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	/**
+	 * Add a download to the list.
+	 * @param downloadComponent The download view to add.
+	 */
+	public void addDownload(DownloadView downloadView) {
+		mDownloads.add(downloadView);
+	}
 
-    /**
-     * Add a download to the list.
-     * @param downloadObject The download object to add.
-     */
-    public void addDownload(DownloadObject downloadObject) {
-        mDownloads.add(downloadObject);
-        mProgressBars.add(new JProgressBar());
-    }
-
+	/**
+	 * Update a download with the specified event.
+	 * @param downloadEvent The download event that was performed.
+	 */
+	public void update(DownloadEvent downloadEvent) {
+	}
 }

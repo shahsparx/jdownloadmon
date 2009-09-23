@@ -6,10 +6,9 @@ package downloadmanager;
  */
 public interface DownloadObserver {
 
-    /**
-     * A download event was performed.
-     * @param downloadEvent The download event that was performed.
-     */
-    public void downloadEventPerformed(DownloadEvent downloadEvent);
-
+	/**
+	 * A download event was performed.
+	 * @param downloadEvent The download event that was performed.
+	 */
+	public void downloadEventPerformed(DownloadEvent downloadEvent);
 }

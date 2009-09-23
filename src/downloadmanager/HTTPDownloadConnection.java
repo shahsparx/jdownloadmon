@@ -6,22 +6,21 @@ package downloadmanager;
  */
 public class HTTPDownloadConnection extends DownloadConnection {
 
-    /**
-     * Construct a HTTP Download Connection.
-     * @param URL The URL to the server.
-     */
-    public HTTPDownloadConnection(String URL) {
-        super(URL);
-    }
+	/**
+	 * Construct a HTTP Download Connection.
+	 * @param URL The URL to the server.
+	 */
+	public HTTPDownloadConnection(String URL) {
+		super(URL);
+	}
 
-    @Override
-    public int[] getBytes(int position, int size) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	@Override
+	public int[] getBytes(int position, int size) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public void connect() throws UnableToConnectException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+	@Override
+	public void connect() throws UnableToConnectException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

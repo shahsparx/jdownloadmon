@@ -1,7 +1,14 @@
 package downloadmanager.gui;
 
 import downloadmanager.DownloadManager;
+import downloadmanager.DownloadObject;
+import downloadmanager.MalformedURLException;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * The add download button is the button in the add download dialog box and is for
@@ -11,21 +18,39 @@ import javax.swing.JButton;
  */
 public class AddDownloadButton extends Button {
 
-    private AddDownloadBox mAddDownloadBox;
+	/** The add download box this button is associated with. */
+	private AddDownloadBox mAddDownloadBox;
+	/** The JFrame this button is associated with. */
+	private JFrame mFrame;
+	/** The error label that appears if the URL is not valid. */
+	private JLabel mErrorLabel;
 
-    /**
-     * Construct an add download button.
-     * @param addDownloadBox The add download box this button resides in.
-     * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
-     */
-    public AddDownloadButton(JButton button, DownloadManager downloadManager, AddDownloadBox addDownloadBox) {
-        super(button, downloadManager);
-        mAddDownloadBox = addDownloadBox;
-    }
+	/**
+	 * Construct an add download button.
+	 * @param button The add download JButton.
+	 * @param addDownloadBox The add download box this button resides in.
+	 */
+	public AddDownloadButton(JButton button, AddDownloadBox addDownloadBox, JFrame frame) {
+		super(button);
+		mAddDownloadBox = addDownloadBox;
+		mFrame = frame;
+		mAddDownloadBox.getURLTextField().addActionListener(this);
+		mErrorLabel = new JLabel("Invalid URL");
+		mErrorLabel.setForeground(Color.red);
+		mFrame.getContentPane().add(mErrorLabel, BorderLayout.SOUTH);
+		mFrame.pack();
+		mErrorLabel.setVisible(false);
+	}
 
-    @Override
-    public void push() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+	@Override
+	public void push() {
+		try {
+			DownloadObject dO = DownloadManager.INSTANCE.addDownload(mAddDownloadBox.getURLTextField().getText());
+			GUI.INSTANCE.addDownloadObject(dO);
+			mFrame.dispose();
+		} catch (MalformedURLException me) {
+			mErrorLabel.setText(me.getMessage());
+			mErrorLabel.setVisible(true);
+		}
+	}
 }

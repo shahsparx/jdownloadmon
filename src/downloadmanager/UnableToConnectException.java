@@ -6,12 +6,11 @@ package downloadmanager;
  */
 public class UnableToConnectException extends Exception {
 
-    /**
-     * Construct the exception.
-     * @param message The error message of this exception.
-     */
-    public UnableToConnectException(String message) {
-        super(message);
-    }
-
+	/**
+	 * Construct the exception.
+	 * @param message The error message of this exception.
+	 */
+	public UnableToConnectException(String message) {
+		super(message);
+	}
 }

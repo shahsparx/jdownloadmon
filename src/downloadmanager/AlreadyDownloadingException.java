@@ -6,12 +6,11 @@ package downloadmanager;
  */
 class AlreadyDownloadingException extends Exception {
 
-    /**
-     * Construct a new already downloading exception.
-     * @param message The message of the exception.
-     */
-    public AlreadyDownloadingException(String message) {
-        super(message);
-    }
-
+	/**
+	 * Construct a new already downloading exception.
+	 * @param message The message of the exception.
+	 */
+	public AlreadyDownloadingException(String message) {
+		super(message);
+	}
 }
