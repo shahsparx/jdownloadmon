@@ -41,11 +41,6 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	public boolean addToActiveList(DownloadObject downloadObject) {
 		throw new UnsupportedOperationException("Not supported yet.");
-	    return false;
-	}
-
-	mActiveList.add(downloadObject);
-	return true;
 	}
 
 	/**
@@ -116,11 +111,11 @@ public class DownloadManager implements DownloadObserver {
 	 * @param URL The url at which the download is located.
 	 */
 	public DownloadObject addDownload(String URL) throws MalformedURLException {
-		boolean valid = false; // if url is valid;
+		boolean valid = true; // if url is valid;
 		if (!valid) {
 			throw new MalformedURLException("The URL is not a valid URL");
 		}
-		DownloadObject downloadObject = new DownloadObject("C:/downloads/", new HTTPDownloadConnection(URL));
+		DownloadObject downloadObject = new DownloadObject("C:/downloads/textFile.txt", new HTTPDownloadConnection(URL));
 		downloadObject.addListener(this);
 		return downloadObject;
 	}

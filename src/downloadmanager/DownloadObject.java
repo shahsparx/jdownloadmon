@@ -28,7 +28,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 * @param connection The download connection to use for downloading.
 	 */
 	public DownloadObject(String destination, DownloadConnection connection) {
-
+		mDestination = destination;
 		mDownloadConnection = connection;
 		mDownloadObservers = new ArrayList<DownloadObserver>();
 		mStatusState = new InactiveState(this);

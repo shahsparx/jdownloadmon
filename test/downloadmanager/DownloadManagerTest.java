@@ -1,6 +1,7 @@
 package downloadmanager;
 
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -46,25 +47,6 @@ public class DownloadManagerTest {
 	    result = instance.addToActiveList(downloadObject);
 	    assertEquals(expResult, result);
 	}
-	
-	expResult = false;
-	result = instance.addToActiveList(downloadObject);
-	assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getSelectedList method, of class DownloadManager.
-     */
-    @Test
-    public void testGetSelectedList() {
-	System.out.println("getSelectedList");
-	DownloadManager instance = new DownloadManager();
-	ArrayList expResult = null;
-	ArrayList result = instance.getSelectedList();
-		assertEquals(expResult, result);
-		// TODO review the generated test code and remove the default call to fail.
-		fail("The test case is a prototype.");
-	}
 
 	/**
 	 * Test of addDownload method, of class DownloadManager.
@@ -74,7 +56,11 @@ public class DownloadManagerTest {
 		System.out.println("addDownload");
 		String URL = "";
 		DownloadManager instance = null;
-		instance.addDownload(URL);
+		try {
+			instance.addDownload(URL);
+		} catch (MalformedURLException ex) {
+			Logger.getLogger(DownloadManagerTest.class.getName()).log(Level.SEVERE, null, ex);
+		}
 		// TODO review the generated test code and remove the default call to fail.
 		fail("The test case is a prototype.");
 	}

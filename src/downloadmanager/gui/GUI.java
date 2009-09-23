@@ -10,6 +10,9 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * The GUI for the Download Manager.
@@ -76,7 +79,8 @@ public class GUI implements DownloadObserver {
 	 * Private constructor for GUI.
 	 */
 	private GUI() {
-		mQueue = new DownloadQueue();
+		DownloadTableModel model = new DownloadTableModel();
+		mQueue = new DownloadQueue(model);
 		mStartButton = new JButton("start");
 		mStopButton =  new JButton("stop");
 		mRemoveButton =  new JButton("remove");
@@ -105,8 +109,8 @@ public class GUI implements DownloadObserver {
 		bottomButtonsPanel.add(mMoveDownQueueButton);
 
 		JPanel middlePanel = new JPanel();
-		middlePanel.setPreferredSize(new Dimension(100,300));
-		middlePanel.add(mQueue);
+		JScrollPane pane = new JScrollPane(mQueue);
+		middlePanel.add(pane);
 
 		JFrame frame = new JFrame("jDownloadMon");
 		Container content = frame.getContentPane();
@@ -116,9 +120,9 @@ public class GUI implements DownloadObserver {
 		content.add(bottomButtonsPanel, BorderLayout.SOUTH);
 		
 		frame.pack();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocation(200, 200);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 	}
 
 	/**
@@ -135,6 +139,7 @@ public class GUI implements DownloadObserver {
 	 */
 	public void addDownloadObject(DownloadObject downloadObject) {
 		DownloadView downloadView = new DownloadView(downloadObject);
+		mQueue.addDownload(downloadView);
 	}
 
 	/**
