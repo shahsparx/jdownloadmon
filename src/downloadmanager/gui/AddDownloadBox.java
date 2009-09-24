@@ -1,6 +1,9 @@
 package downloadmanager.gui;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.text.DefaultEditorKit;
 
 /**
  * The add download dialog box is used for adding a new download to the download manager.
@@ -16,6 +19,17 @@ public class AddDownloadBox {
 	 */
 	public AddDownloadBox(JTextField field) {
 		mURLTextField = field;
+		JPopupMenu popup = new JPopupMenu();
+		JMenuItem item = new JMenuItem(new DefaultEditorKit.CutAction());
+		item.setText("Cut");
+		popup.add(item);
+		item = new JMenuItem(new DefaultEditorKit.CopyAction());
+		item.setText("Copy");
+		popup.add(item);
+		item = new JMenuItem(new DefaultEditorKit.PasteAction());
+		item.setText("Paste");
+		popup.add(item);
+		mURLTextField.setComponentPopupMenu(popup);
 	}
 
 	/**

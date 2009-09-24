@@ -1,25 +1,24 @@
 package downloadmanager.gui;
 
-import downloadmanager.DownloadEvent;
+import downloadmanager.DownloadProgressEvent;
 import downloadmanager.DownloadObject;
-import downloadmanager.DownloadObserver;
+import downloadmanager.DownloadProgressObserver;
+import downloadmanager.DownloadStatusStateEvent;
+import downloadmanager.DownloadStatusStateObserver;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 /**
  * The GUI for the Download Manager.
  * [singleton]
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class GUI implements DownloadObserver {
+public class GUI implements DownloadProgressObserver, DownloadStatusStateObserver {
 
 	/** The singleton instance of the GUI. */
 	public static final GUI INSTANCE = new GUI();
@@ -81,11 +80,12 @@ public class GUI implements DownloadObserver {
 	private GUI() {
 		DownloadTableModel model = new DownloadTableModel();
 		mQueue = new DownloadQueue(model);
-		mStartButton = new JButton("start");
-		mStopButton =  new JButton("stop");
-		mRemoveButton =  new JButton("remove");
-		mMoveUpQueueButton = new JButton("up");
-		mMoveDownQueueButton = new JButton("down");
+		mStartButton = new JButton(IconStore.INSTANCE.getImageIcon("start.png"));
+		mStartButton.setToolTipText("start");
+		mStopButton = new JButton(IconStore.INSTANCE.getImageIcon("stop.png"));
+		mRemoveButton =  new JButton(IconStore.INSTANCE.getImageIcon("remove.png"));
+		mMoveUpQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("up.png"));
+		mMoveDownQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("down.png"));
 
 		setupGUI();
 	}
@@ -96,7 +96,7 @@ public class GUI implements DownloadObserver {
 	private void setupGUI() {
 		JPanel topButtonsPanel = new JPanel();
 		topButtonsPanel.setLayout(new FlowLayout());
-		JButton button = new JButton("new");
+		JButton button = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
 		new NewDownloadButton(button);
 		topButtonsPanel.add(button);
 		topButtonsPanel.add(mStartButton);
@@ -127,10 +127,18 @@ public class GUI implements DownloadObserver {
 
 	/**
 	 * Update the download queue.
-	 * @param downloadEvent The download event with the new information.
+	 * @param downloadProgressEvent The download event with the new information.
 	 */
-	public void downloadEventPerformed(DownloadEvent downloadEvent) {
-		mQueue.update(downloadEvent);
+	public void downloadProgressEventPerformed(DownloadProgressEvent downloadProgressEvent) {
+		mQueue.update(downloadProgressEvent);
+	}
+
+	/**
+	 * Update the download queue.
+	 * @param downloadStatusStateEvent The download event with the new information.
+	 */
+	public void downloadStatusStateEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
+		mQueue.update(downloadStatusStateEvent);
 	}
 
 	/**
@@ -138,8 +146,8 @@ public class GUI implements DownloadObserver {
 	 * @param downloadObject The download object to add.
 	 */
 	public void addDownloadObject(DownloadObject downloadObject) {
-		DownloadView downloadView = new DownloadView(downloadObject);
-		mQueue.addDownload(downloadView);
+		DownloadView downloadView = new DownloadView(downloadObject, new InactiveViewState());
+		mQueue.addDownloadView(downloadView);
 	}
 
 	/**

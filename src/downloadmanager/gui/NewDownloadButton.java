@@ -24,11 +24,11 @@ public class NewDownloadButton extends Button {
 
     @Override
     public void push() {
-		JFrame frame = new JFrame("New Download - jDownloadMon");
+		JFrame frame = new JFrame("New Download");
 		Container content = frame.getContentPane();
 		JPanel center = new JPanel();
 		center.setLayout(new FlowLayout());
-		JButton addButton = new JButton("add");
+		JButton addButton = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
 		JTextField urlField = new JTextField(15);
 		center.add(urlField);
 		center.add(addButton);

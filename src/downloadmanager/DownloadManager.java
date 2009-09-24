@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * [singleton]
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadManager implements DownloadObserver {
+public class DownloadManager implements DownloadProgressObserver, DownloadStatusStateObserver {
 
 	/** The singleton instance of this DownloadManager. */
 	public static final DownloadManager INSTANCE = new DownloadManager();
@@ -115,28 +115,24 @@ public class DownloadManager implements DownloadObserver {
 		if (!valid) {
 			throw new MalformedURLException("The URL is not a valid URL");
 		}
-		DownloadObject downloadObject = new DownloadObject("C:/downloads/textFile.txt", new HTTPDownloadConnection(URL));
-		downloadObject.addListener(this);
+		DownloadObject downloadObject = new DownloadObject("C:/downloads/image.jpg", new HTTPDownloadConnection(URL));
+		mInactiveList.add(downloadObject);
+		downloadObject.addProgressListener(this);
+		downloadObject.addStatusStateListener(this);
 		return downloadObject;
 	}
 
 	/**
-	 * Tries to start downloading all download objects in the selected list.
+	 * @see DownloadProgressObserver
 	 */
-	public void startDownloading() {
+	public void downloadProgressEventPerformed(DownloadProgressEvent downloadProgressEvent) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	/**
-	 * Tries to stop downloading all download objects in the selected list.
+	 * @see DownloadStatusStateObserver
 	 */
-	public void stopDownloading() {
+	public void downloadStatusStateEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
 		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	/**
-	 * @see DownloadObserver
-	 */
-	public void downloadEventPerformed(DownloadEvent downloadEvent) {
 	}
 }

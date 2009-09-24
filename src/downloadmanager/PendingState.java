@@ -15,12 +15,8 @@ public class PendingState extends StatusState {
 	}
 
 	@Override
-	public void download() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-	@Override
 	public StatusState getShallowCopy() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return new PendingState(null);
 	}
 
 	@Override

@@ -35,10 +35,10 @@ public class AddDownloadButton extends Button {
 		mFrame = frame;
 		mAddDownloadBox.getURLTextField().addActionListener(this);
 		mErrorLabel = new JLabel("Invalid URL");
+		mErrorLabel.setVisible(false);
 		mErrorLabel.setForeground(Color.red);
 		mFrame.getContentPane().add(mErrorLabel, BorderLayout.SOUTH);
 		mFrame.pack();
-		mErrorLabel.setVisible(false);
 	}
 
 	@Override

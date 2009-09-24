@@ -7,10 +7,12 @@ import java.util.ArrayList;
  * The class contains methods for connecting to and downloading files among other things.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadObject implements Runnable, DownloadObservable {
+public class DownloadObject implements Runnable, DownloadProgressObservable, DownloadStatusStateObservable {
 
-	/** List of observers observing this download object. */
-	private ArrayList<DownloadObserver> mDownloadObservers;
+	/** List of progress observers observing this download object. */
+	private ArrayList<DownloadProgressObserver> mProgressObservers;
+	/** List of status state observers observing this download object. */
+	private ArrayList<DownloadStatusStateObserver> mStatusStateObservers;
 	/** The download file's destionation. */
 	private String mDestination;
 	/** The current downloaded size, in bytes. */
@@ -30,7 +32,8 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	public DownloadObject(String destination, DownloadConnection connection) {
 		mDestination = destination;
 		mDownloadConnection = connection;
-		mDownloadObservers = new ArrayList<DownloadObserver>();
+		mProgressObservers = new ArrayList<DownloadProgressObserver>();
+		mStatusStateObservers = new ArrayList<DownloadStatusStateObserver>();
 		mStatusState = new InactiveState(this);
 	}
 
@@ -41,28 +44,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	/**
-	 * @see DownloadObservable#addListener(DownloadObserver observer)
-	 */
-	public void addListener(DownloadObserver observer) {
-		mDownloadObservers.add(observer);
-	}
 
-	/**
-	 * @see DownloadObservable#removeListener(DownloadObserver observer)
-	 */
-	public void removeListener(DownloadObserver observer) {
-		mDownloadObservers.remove(observer);
-	}
-
-	/**
-	 * @see DownloadObservable#notifyListeners(DownloadEvent downloadEvent)
-	 */
-	public void notifyListeners(DownloadEvent downloadEvent) {
-		for(DownloadObserver observer : mDownloadObservers) {
-			observer.downloadEventPerformed(downloadEvent);
-		}
-	}
 
 	/**
 	 * Get the current state of the download object.
@@ -131,9 +113,48 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	}
 
 	/**
-	 * Try to start the download of the download object.
+	 * @see DownloadProgressObservable#addProgressListener(DownloadProgressObserver observer)
 	 */
-	public void download() {
-		mStatusState.download();
+	public void addProgressListener(DownloadProgressObserver observer) {
+		mProgressObservers.add(observer);
+	}
+
+	/**
+	 * @see DownloadProgressObservable#removeProgressListener(DownloadProgressObserver observer)
+	 */
+	public void removeProgressListener(DownloadProgressObserver observer) {
+		mProgressObservers.remove(observer);
+	}
+
+	/**
+	 * @see DownloadProgressObservable#notifyProgressListeners(DownloadProgressEvent downloadProgressEvent)
+	 */
+	public void notifyProgressListeners(DownloadProgressEvent downloadProgressEvent) {
+		for(DownloadProgressObserver observer : mProgressObservers) {
+			observer.downloadProgressEventPerformed(downloadProgressEvent);
+		}
+	}
+
+	/**
+	 * @see DownloadStatusStateObservable#addProgressListener(DownloadProgressObserver observer)
+	 */
+	public void addStatusStateListener(DownloadStatusStateObserver observer) {
+		mStatusStateObservers.add(observer);
+	}
+
+	/**
+	 * @see DownloadStatusStateObservable#removeProgressListener(DownloadProgressObserver observer)
+	 */
+	public void removeStatusStateListener(DownloadStatusStateObserver observer) {
+		mStatusStateObservers.remove(observer);
+	}
+
+	/**
+	 * @see DownloadStatusStateObservable#notifyProgressListeners(DownloadProgressEvent downloadProgressEvent)
+	 */
+	public void notifyStatusStateListeners(DownloadStatusStateEvent downloadStatusStateEvent) {
+		for(DownloadStatusStateObserver observer : mStatusStateObservers) {
+			observer.downloadStatusStateEventPerformed(downloadStatusStateEvent);
+		}
 	}
 }
