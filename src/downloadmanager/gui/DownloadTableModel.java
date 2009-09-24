@@ -13,9 +13,12 @@ public class DownloadTableModel extends DefaultTableModel {
 		return false;
 	}
 
-	@Override
-	public Class getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-    }
-
+	/**
+	 * Convert a download view into a table row with data and add it.
+	 * @param downloadView The download view to add.
+	 */
+	public void addDownloadView(DownloadView downloadView) {
+		Object[] rowData = { downloadView.getFileName(), downloadView.getViewState(), downloadView };
+		addRow(rowData);
+	}
 }

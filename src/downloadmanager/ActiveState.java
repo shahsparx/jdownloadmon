@@ -5,7 +5,6 @@ package downloadmanager;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class ActiveState extends StatusState {
-
 	/**
 	 * Construct an active state.
 	 * @param downloadObject The downloadObject associated with this state.
@@ -15,12 +14,8 @@ public class ActiveState extends StatusState {
 	}
 
 	@Override
-	public void download() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-	@Override
 	public StatusState getShallowCopy() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return new ActiveState(null);
 	}
 
 	@Override
