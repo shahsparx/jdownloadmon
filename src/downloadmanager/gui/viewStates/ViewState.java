@@ -1,5 +1,6 @@
-package downloadmanager.gui;
+package downloadmanager.gui.viewStates;
 
+import downloadmanager.gui.*;
 import java.awt.Component;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -9,7 +10,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  *
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public abstract class ViewState extends DefaultTableCellRenderer {
+public abstract class ViewState {
 
 	/**
 	 * Get an image...
@@ -26,14 +27,6 @@ public abstract class ViewState extends DefaultTableCellRenderer {
 	 */
 	public String getFilename() {
 		return toString() + ".png";
-	}
-
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		ViewState v = (ViewState) value;
-		setIcon(v.getImageIcon());
-		setText(v.toString());
-		return this;
 	}
 
 	@Override

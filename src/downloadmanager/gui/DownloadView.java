@@ -1,8 +1,9 @@
 package downloadmanager.gui;
 
+import downloadmanager.gui.viewStates.ViewState;
 import downloadmanager.DownloadObject;
+import downloadmanager.gui.viewStates.ViewStateRenderer;
 import java.awt.Component;
-import java.awt.Image;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -18,18 +19,17 @@ public class DownloadView implements TableCellRenderer {
 	/** The progress bar for this download component. */
 	private JProgressBar mProgressBar;
 	/** The Viewstate of this download view. */
-	private ViewState mViewState;
+	private ViewStateRenderer mViewStateRenderer;
 
 	/**
 	 * Construct a download component.
 	 * @param downloadObject The download object to be viewed.
 	 */
-	public DownloadView (DownloadObject downloadObject, ViewState viewState) {
+	public DownloadView (DownloadObject downloadObject, ViewStateRenderer viewStateRenderer) {
 		mDownloadObject =  downloadObject;
-		mViewState = viewState;
+		mViewStateRenderer = viewStateRenderer;
 		mProgressBar = new JProgressBar(0, 100);
 		mProgressBar.setStringPainted(true);
-		mProgressBar.setValue(10);
 	}
 
 	/**
@@ -45,8 +45,7 @@ public class DownloadView implements TableCellRenderer {
 	 * @return The file name and extension of the download object as a <tt>String</tt>.
 	 */
 	public String getFileName() {
-		String[] strings = mDownloadObject.getDestination().split("/");
-		return strings[strings.length-1];
+		return "new file";
 	}
 
 	/**
@@ -61,8 +60,8 @@ public class DownloadView implements TableCellRenderer {
 	 * Get the status of the download (one of active, inactive, pending, error, completed).
 	 * @return status of the download.
 	 */
-	public ViewState getViewState() {
-		return mViewState;
+	public ViewStateRenderer getViewStateRenderer() {
+		return mViewStateRenderer;
 	}
 
 	/**
@@ -70,7 +69,7 @@ public class DownloadView implements TableCellRenderer {
 	 * @param viewState The view state to change to.
 	 */
 	public void setViewState(ViewState viewState) {
-		mViewState = viewState;
+		mViewStateRenderer.setViewState(viewState);
 	}
 
 	/**

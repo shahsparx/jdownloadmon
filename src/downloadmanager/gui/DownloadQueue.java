@@ -1,23 +1,30 @@
 package downloadmanager.gui;
 
-import downloadmanager.ActiveState;
-import downloadmanager.CompletedState;
-import downloadmanager.DownloadProgressEvent;
+import downloadmanager.gui.viewStates.CompletedViewState;
+import downloadmanager.gui.viewStates.ErrorViewState;
+import downloadmanager.gui.viewStates.ActiveViewState;
+import downloadmanager.gui.viewStates.PendingViewState;
+import downloadmanager.gui.viewStates.InactiveViewState;
+import downloadmanager.states.ActiveState;
+import downloadmanager.states.CompletedState;
+import downloadmanager.events.DownloadProgressEvent;
 import downloadmanager.DownloadObject;
-import downloadmanager.DownloadStatusStateEvent;
-import downloadmanager.ErrorState;
-import downloadmanager.InactiveState;
-import downloadmanager.PendingState;
-import downloadmanager.StatusState;
+import downloadmanager.events.DownloadStatusStateEvent;
+import downloadmanager.gui.viewStates.ViewStateRenderer;
+import downloadmanager.states.ErrorState;
+import downloadmanager.states.InactiveState;
+import downloadmanager.states.PendingState;
+import downloadmanager.states.StatusState;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
 
 /**
  * A download queue for the gui to show the list of download objects.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadQueue extends JTable {
+public class DownloadQueue extends JTable implements ActionListener {
 
 	/** The list of download views. */
 	private HashMap<DownloadObject, DownloadView> mDownloadViews;
@@ -28,6 +35,7 @@ public class DownloadQueue extends JTable {
 	 * The columns in this table.
 	 */
 	private enum Columns {
+
 		/** Filename column. */
 		Filename,
 		/** Status state icon column. */
@@ -47,7 +55,7 @@ public class DownloadQueue extends JTable {
 		mTableModel.setColumnIdentifiers(Columns.values());
 		//set the progress column so that a progressbar is renderable in it.
 		columnModel.getColumn(columnModel.getColumnIndex(Columns.Progress.toString())).setCellRenderer(new DownloadView(null, null));
-		columnModel.getColumn(columnModel.getColumnIndex(Columns.Status.toString())).setCellRenderer(new InactiveViewState());
+		columnModel.getColumn(columnModel.getColumnIndex(Columns.Status.toString())).setCellRenderer(new ViewStateRenderer(new InactiveViewState()));
 	}
 
 	/**
@@ -74,15 +82,16 @@ public class DownloadQueue extends JTable {
 	public void update(DownloadProgressEvent downloadProgressEvent) {
 		DownloadView view = mDownloadViews.get(downloadProgressEvent.getDownloadObject());
 		view.setProgressBarValue(downloadProgressEvent.getPercentDownloaded());
+		this.repaint();
 	}
 
 	/**
 	 * Update a download with the specified download event.
 	 * @param downloadStatusStateEvent The download event that was performed.
 	 */
-	void update(DownloadStatusStateEvent downloadStatusStateEvent) {
+	public void update(DownloadStatusStateEvent downloadStatusStateEvent) {
 		DownloadView view = mDownloadViews.get(downloadStatusStateEvent.getDownloadObject());
-		StatusState statusState = downloadStatusStateEvent.getStatusState();
+		StatusState statusState = downloadStatusStateEvent.getNewStatusState();
 		if (statusState instanceof ActiveState) {
 			view.setViewState(new ActiveViewState());
 		} else if (statusState instanceof InactiveState) {
@@ -94,18 +103,7 @@ public class DownloadQueue extends JTable {
 		} else if (statusState instanceof ErrorState) {
 			view.setViewState(new ErrorViewState());
 		}
-	}
 
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		super.valueChanged(e);
-		if (!e.getValueIsAdjusting()) {
-			int column = columnModel.getColumnIndex(Columns.Progress.toString());
-			for (int row : getSelectedRows()) {
-				DownloadView view = (DownloadView) getValueAt(row, column);
-				view.setProgressBarValue((int)(100*Math.random()));
-			}
-		}
 		this.repaint();
 	}
 
@@ -116,5 +114,41 @@ public class DownloadQueue extends JTable {
 	 */
 	public DownloadView getDownloadView(DownloadObject downloadObject) {
 		return mDownloadViews.get(downloadObject);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		Object source = e.getSource();
+		DownloadView[] views = new DownloadView[getSelectedRows().length];
+
+		int i = 0;
+		int column = columnModel.getColumnIndex(Columns.Progress.toString());
+		for (int row : getSelectedRows()) {
+			DownloadView view = (DownloadView) getValueAt(row, column);
+			views[i] = view;
+			i++;
+		}
+
+		if (source.equals(GUI.INSTANCE.getStartButton())) {
+			for (DownloadView view : views) {
+				view.getDownloadObject().download();
+			}
+		} else if (source.equals(GUI.INSTANCE.getStopButton())) {
+			for (DownloadView view : views) {
+				view.getDownloadObject().stop();
+			}
+		} else if (source.equals(GUI.INSTANCE.getRemoveButton())) {
+			for (DownloadView view : views) {
+				view.getDownloadObject().stop();
+				// remove from downloadmanager and table
+			}
+		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
+			for (DownloadView view : views) {
+				// move stuff up
+			}
+		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {
+			for (DownloadView view : views) {
+				// move stuff down
+			}
+		}
 	}
 }

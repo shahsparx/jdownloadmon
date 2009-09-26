@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.events;
+
+import downloadmanager.*;
 
 /**
  * A download progress event contains information about the percent downloaded of a {@link DownloadObject}.

@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.states;
+
+import downloadmanager.*;
 
 /**
  * An error state indicates an error and has an error message to describe the error.
@@ -27,12 +29,18 @@ public class ErrorState extends StatusState {
 	}
 
 	@Override
-	public StatusState getShallowCopy() {
-		return new ErrorState(null, mErrorMessage);
+	public void download() {
+		Thread t = new Thread(mDownloadObject);
+		t.start();
 	}
 
 	@Override
-	public void setStatusState(StatusState state, DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void changeFrom() {
+		DownloadManager.INSTANCE.removeFromErrorList(mDownloadObject);
+	}
+
+	@Override
+	public boolean changeTo() {
+		return DownloadManager.INSTANCE.addToErrorList(mDownloadObject);
 	}
 }

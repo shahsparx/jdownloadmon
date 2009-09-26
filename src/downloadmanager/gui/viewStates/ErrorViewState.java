@@ -1,13 +1,13 @@
-package downloadmanager.gui;
+package downloadmanager.gui.viewStates;
 
 /**
  *
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class InactiveViewState extends ViewState {
+public class ErrorViewState extends ViewState {
 
 	@Override
 	public String toString() {
-		return "inactive";
+		return "error";
 	}
 }

@@ -1,5 +1,11 @@
 package downloadmanager;
 
+import downloadmanager.states.ActiveState;
+import downloadmanager.states.StatusState;
+import downloadmanager.states.ErrorState;
+import downloadmanager.states.InactiveState;
+import downloadmanager.events.DownloadStatusStateEvent;
+import downloadmanager.events.DownloadProgressEvent;
 import java.util.ArrayList;
 
 /**
@@ -7,12 +13,14 @@ import java.util.ArrayList;
  * The class contains methods for connecting to and downloading files among other things.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadObject implements Runnable, DownloadProgressObservable, DownloadStatusStateObservable {
+public class DownloadObject implements Runnable, DownloadObservable {
 
+	/** Buffer size. */
+	private static final int BUFFER_SIZE = 1024;
+	/** Default directory location */
+	private static final String DEFAULT_DIRECTORY = "C:/Downloads/";
 	/** List of progress observers observing this download object. */
-	private ArrayList<DownloadProgressObserver> mProgressObservers;
-	/** List of status state observers observing this download object. */
-	private ArrayList<DownloadStatusStateObserver> mStatusStateObservers;
+	private ArrayList<DownloadObserver> mObservers;
 	/** The download file's destionation. */
 	private String mDestination;
 	/** The current downloaded size, in bytes. */
@@ -23,28 +31,54 @@ public class DownloadObject implements Runnable, DownloadProgressObservable, Dow
 	private StatusState mStatusState;
 	/** The connection to the server. */
 	private DownloadConnection mDownloadConnection;
+	/** File handler to write and read files on system. */
+	private FileHandler mFileHandler;
 
 	/**
 	 * Construct a download object.
 	 * @param destination Where to put the file on the drive.
 	 * @param connection The download connection to use for downloading.
 	 */
-	public DownloadObject(String destination, DownloadConnection connection) {
-		mDestination = destination;
+	public DownloadObject(DownloadConnection connection) {
 		mDownloadConnection = connection;
-		mProgressObservers = new ArrayList<DownloadProgressObserver>();
-		mStatusStateObservers = new ArrayList<DownloadStatusStateObserver>();
+		mObservers = new ArrayList<DownloadObserver>();
 		mStatusState = new InactiveState(this);
+	}
+
+	/**
+	 * Try to start the download.
+	 */
+	public void download() {
+		mStatusState.download();
 	}
 
 	/**
 	 * @see Runnable#run()
 	 */
 	public void run() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		try {
+			mSize = mDownloadConnection.connect();
+			mFileHandler = new FileHandler(mDownloadConnection.getURL());
+			notifyListeners(new DownloadStatusStateEvent(new ActiveState(this)));
+				while (mStatusState instanceof ActiveState) {
+					byte[] bytes = mDownloadConnection.getBytes(mDownloadedSize, BUFFER_SIZE, mSize);
+					mFileHandler.write(bytes, mDownloadedSize);
+					mDownloadedSize += bytes.length;
+					notifyListeners(new DownloadProgressEvent(this));
+					// TODO this code is to be organized by downloadmanager:
+					//if (mDownloadedSize == mSize) {
+					//	setStatusState(new CompletedState(this));
+					//	break;
+					//}
+				}
+		} catch (Exception ex) {
+			notifyListeners(new DownloadStatusStateEvent(new ErrorState(this, ex.getMessage())));
+			ex.printStackTrace();
+		} finally {
+			mDownloadConnection.close();
+			mFileHandler.close();
+		}
 	}
-
-
 
 	/**
 	 * Get the current state of the download object.
@@ -59,7 +93,7 @@ public class DownloadObject implements Runnable, DownloadProgressObservable, Dow
 	 * @return an <tt>integer</tt> value representing how far this download has gotten percentually.
 	 */
 	public int getPercentDownloaded() {
-		return 0;
+		return (int) (mDownloadedSize * 100 / mSize);
 	}
 
 	/**
@@ -67,7 +101,12 @@ public class DownloadObject implements Runnable, DownloadProgressObservable, Dow
 	 * @param state The StatusState to change to.
 	 */
 	public void setStatusState(StatusState state) {
-		mStatusState.setStatusState(state, this);
+		if (mStatusState.changeTo(state)) {
+			mStatusState = state;
+		} else {
+			DownloadStatusStateEvent event = new DownloadStatusStateEvent(mStatusState);
+			notifyListeners(event);
+		}
 	}
 
 	/**
@@ -79,19 +118,6 @@ public class DownloadObject implements Runnable, DownloadProgressObservable, Dow
 	}
 
 	/**
-	 * Set the destination.
-	 * Will have to stop downloading first for it to work.
-	 * @param newDestination The destination file path, as a String.
-	 */
-	public void setDestination(String newDestination) throws AlreadyDownloadingException {
-		if (!(mStatusState instanceof ActiveState)) {
-			mDestination = newDestination;
-		} else {
-			throw new AlreadyDownloadingException("Cannot change destination, already downloading!");
-		}
-	}
-
-	/**
 	 * Get the download connection of this download object.
 	 * @return The download connection of this download object.
 	 */
@@ -99,62 +125,27 @@ public class DownloadObject implements Runnable, DownloadProgressObservable, Dow
 		return mDownloadConnection;
 	}
 
-	/**
-	 * Set the connection to a new connection.
-	 * Will have to stop downloading first for it to work.
-	 * @param downloadConnection The new connection to set to.
-	 */
-	public void setConnection(DownloadConnection downloadConnection) throws AlreadyDownloadingException {
-		if (!(mStatusState instanceof ActiveState)) {
-			mDownloadConnection = downloadConnection;
-		} else {
-			throw new AlreadyDownloadingException("Cannot change connection, already downloading!");
+	public void addListener(DownloadObserver observer) {
+		mObservers.add(observer);
+	}
+
+	public void removeListener(DownloadObserver observer) {
+		mObservers.remove(observer);
+	}
+
+	public void notifyListeners(DownloadProgressEvent downloadProgressEvent) {
+		for (DownloadObserver observer : mObservers) {
+			observer.downloadEventPerformed(downloadProgressEvent);
 		}
 	}
 
-	/**
-	 * @see DownloadProgressObservable#addProgressListener(DownloadProgressObserver observer)
-	 */
-	public void addProgressListener(DownloadProgressObserver observer) {
-		mProgressObservers.add(observer);
-	}
-
-	/**
-	 * @see DownloadProgressObservable#removeProgressListener(DownloadProgressObserver observer)
-	 */
-	public void removeProgressListener(DownloadProgressObserver observer) {
-		mProgressObservers.remove(observer);
-	}
-
-	/**
-	 * @see DownloadProgressObservable#notifyProgressListeners(DownloadProgressEvent downloadProgressEvent)
-	 */
-	public void notifyProgressListeners(DownloadProgressEvent downloadProgressEvent) {
-		for(DownloadProgressObserver observer : mProgressObservers) {
-			observer.downloadProgressEventPerformed(downloadProgressEvent);
+	public void notifyListeners(DownloadStatusStateEvent downloadStatusStateEvent) {
+		for (DownloadObserver observer : mObservers) {
+			observer.downloadEventPerformed(downloadStatusStateEvent);
 		}
 	}
 
-	/**
-	 * @see DownloadStatusStateObservable#addProgressListener(DownloadProgressObserver observer)
-	 */
-	public void addStatusStateListener(DownloadStatusStateObserver observer) {
-		mStatusStateObservers.add(observer);
-	}
-
-	/**
-	 * @see DownloadStatusStateObservable#removeProgressListener(DownloadProgressObserver observer)
-	 */
-	public void removeStatusStateListener(DownloadStatusStateObserver observer) {
-		mStatusStateObservers.remove(observer);
-	}
-
-	/**
-	 * @see DownloadStatusStateObservable#notifyProgressListeners(DownloadProgressEvent downloadProgressEvent)
-	 */
-	public void notifyStatusStateListeners(DownloadStatusStateEvent downloadStatusStateEvent) {
-		for(DownloadStatusStateObserver observer : mStatusStateObservers) {
-			observer.downloadStatusStateEventPerformed(downloadStatusStateEvent);
-		}
+	public void stop() {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 }
