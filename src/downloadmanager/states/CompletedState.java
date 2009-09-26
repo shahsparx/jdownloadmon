@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.states;
+
+import downloadmanager.*;
 
 /**
  * A completed state indicates completion.
@@ -15,12 +17,17 @@ public class CompletedState extends StatusState {
 	}
 
 	@Override
-	public StatusState getShallowCopy() {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void download() {
+		// do nothing, already completed.
 	}
 
 	@Override
-	public void setStatusState(StatusState state, DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void changeFrom() {
+		DownloadManager.INSTANCE.removeFromCompletedList(mDownloadObject);
+	}
+
+	@Override
+	public boolean changeTo() {
+		return DownloadManager.INSTANCE.addToCompletedList(mDownloadObject);
 	}
 }

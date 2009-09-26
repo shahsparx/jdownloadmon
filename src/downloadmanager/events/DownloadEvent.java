@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.events;
+
+import downloadmanager.*;
 
 /**
  * A download progress event contains some information about a {@link DownloadObject}.

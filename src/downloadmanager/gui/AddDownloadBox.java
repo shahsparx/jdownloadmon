@@ -19,6 +19,7 @@ public class AddDownloadBox {
 	 */
 	public AddDownloadBox(JTextField field) {
 		mURLTextField = field;
+		mURLTextField.setText("http://www.google.com/intl/en_ALL/images/logo.gif");
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem item = new JMenuItem(new DefaultEditorKit.CutAction());
 		item.setText("Cut");

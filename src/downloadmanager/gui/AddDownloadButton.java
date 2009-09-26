@@ -31,14 +31,16 @@ public class AddDownloadButton extends Button {
 	 */
 	public AddDownloadButton(JButton button, AddDownloadBox addDownloadBox, JFrame frame) {
 		super(button);
+		button.setToolTipText("add");
+		button.setFocusPainted(false);
 		mAddDownloadBox = addDownloadBox;
 		mFrame = frame;
 		mAddDownloadBox.getURLTextField().addActionListener(this);
 		mErrorLabel = new JLabel("Invalid URL");
-		mErrorLabel.setVisible(false);
 		mErrorLabel.setForeground(Color.red);
 		mFrame.getContentPane().add(mErrorLabel, BorderLayout.SOUTH);
 		mFrame.pack();
+		mErrorLabel.setVisible(false);
 	}
 
 	@Override

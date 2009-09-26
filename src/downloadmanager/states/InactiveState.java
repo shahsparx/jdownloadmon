@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.states;
+
+import downloadmanager.*;
 
 /**
  * An inactive state is a paused or stopped state.
@@ -15,11 +17,18 @@ public class InactiveState extends StatusState {
 	}
 
 	@Override
-	public StatusState getShallowCopy() {
-		return new InactiveState(null);
+	public void download() {
+		Thread t = new Thread(mDownloadObject);
+		t.start();
 	}
+
 	@Override
-	public void setStatusState(StatusState state, DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void changeFrom() {
+		DownloadManager.INSTANCE.removeFromInactiveList(mDownloadObject);
+	}
+
+	@Override
+	public boolean changeTo() {
+		return DownloadManager.INSTANCE.addToInactiveList(mDownloadObject);
 	}
 }

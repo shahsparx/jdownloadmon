@@ -1,4 +1,7 @@
-package downloadmanager;
+package downloadmanager.events;
+
+import downloadmanager.states.StatusState;
+import downloadmanager.*;
 
 /**
  * A download progress event contains information about the status state of a {@link DownloadObject}.
@@ -8,14 +11,17 @@ public class DownloadStatusStateEvent extends DownloadEvent {
 
 	/** The status state the download object was at at the time of this event's creation. */
 	private StatusState mStatusState;
+	/** The status state the download is changing to. */
+	private StatusState mNewStatusState;
 
 	/**
 	 * Construct a download status state event.
 	 * @param downloadObject The download object asoociated with this event.
 	 */
-	public DownloadStatusStateEvent(DownloadObject downloadObject) {
-		super(downloadObject);
-		mStatusState = downloadObject.getStatusState();
+	public DownloadStatusStateEvent(StatusState newStatusState) {
+		super(newStatusState.getDownloadObject());
+		mStatusState = mDownloadObject.getStatusState();
+		mNewStatusState = newStatusState;
 	}
 
 	/**
@@ -24,6 +30,13 @@ public class DownloadStatusStateEvent extends DownloadEvent {
 	 */
 	public StatusState getStatusState() {
 		return mStatusState;
+	}
+
+	/**
+	 * @return the state the download is changing to.
+	 */
+	public StatusState getNewStatusState() {
+		return mNewStatusState;
 	}
 
 }

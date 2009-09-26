@@ -1,4 +1,4 @@
-package downloadmanager.gui;
+package downloadmanager.gui.viewStates;
 
 /**
  *

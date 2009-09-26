@@ -18,7 +18,7 @@ public class DownloadTableModel extends DefaultTableModel {
 	 * @param downloadView The download view to add.
 	 */
 	public void addDownloadView(DownloadView downloadView) {
-		Object[] rowData = { downloadView.getFileName(), downloadView.getViewState(), downloadView };
+		Object[] rowData = { downloadView.getFileName(), downloadView.getViewStateRenderer(), downloadView };
 		addRow(rowData);
 	}
 }

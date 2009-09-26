@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.states;
+
+import downloadmanager.*;
 
 /**
  * An active state is a downloading state.
@@ -14,12 +16,17 @@ public class ActiveState extends StatusState {
 	}
 
 	@Override
-	public StatusState getShallowCopy() {
-		return new ActiveState(null);
+	public void download() {
+		// do nothing, already active
 	}
 
 	@Override
-	public void setStatusState(StatusState state, DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void changeFrom() {
+		DownloadManager.INSTANCE.removeFromActiveList(mDownloadObject);
+	}
+
+	@Override
+	public boolean changeTo() {
+		return DownloadManager.INSTANCE.addToActiveList(mDownloadObject);
 	}
 }

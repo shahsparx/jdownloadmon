@@ -20,6 +20,8 @@ public class NewDownloadButton extends Button {
      */
     public NewDownloadButton(JButton button) {
         super(button);
+		button.setToolTipText("new");
+		button.setFocusPainted(false);
     }
 
     @Override

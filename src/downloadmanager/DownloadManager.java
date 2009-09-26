@@ -1,5 +1,9 @@
 package downloadmanager;
 
+import downloadmanager.events.DownloadStatusStateEvent;
+import downloadmanager.events.DownloadProgressEvent;
+import downloadmanager.states.CompletedState;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -7,7 +11,7 @@ import java.util.ArrayList;
  * [singleton]
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadManager implements DownloadProgressObserver, DownloadStatusStateObserver {
+public class DownloadManager implements DownloadObserver {
 
 	/** The singleton instance of this DownloadManager. */
 	public static final DownloadManager INSTANCE = new DownloadManager();
@@ -40,70 +44,75 @@ public class DownloadManager implements DownloadProgressObserver, DownloadStatus
 	 * Will not work if the max number of downloads is already reached.
 	 */
 	public boolean addToActiveList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		if (mActiveList.size() >= mMaxDownloads) {
+			return false;
+		}
+
+		mActiveList.add(downloadObject);
+		return true;
 	}
 
 	/**
 	 * Tries to add a download object to the inactive list.
 	 */
 	public boolean addToInactiveList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return mInactiveList.add(downloadObject);
 	}
 
 	/**
 	 * Tries to add a download object to the pending list.
 	 */
 	public boolean addToPendingList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	return mPendingList.add(downloadObject);
 	}
 
 	/**
 	 * Tries to add a download object to the completed list.
 	 */
 	public boolean addToCompletedList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return mCompletedList.add(downloadObject);
 	}
 
 	/**
 	 * Tries to add a download object to the error list.
 	 */
 	public boolean addToErrorList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return mErrorList.add(downloadObject);
 	}
 
 	/**
 	 * Removes a download from the active list.
 	 */
 	public void removeFromActiveList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		mActiveList.remove(downloadObject);
 	}
 
 	/**
 	 * Removes a download from the inactive list.
 	 */
 	public void removeFromInactiveList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		mInactiveList.remove(downloadObject);
 	}
 
 	/**
 	 * Removes a download from the pending list.
 	 */
 	public void removeFromPendingList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		mPendingList.remove(downloadObject);
 	}
 
 	/**
 	 * Removes a download from the completed list.
 	 */
 	public void removeFromCompletedList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		mCompletedList.remove(downloadObject);
 	}
 
 	/**
 	 * Removes a download from the error list.
 	 */
 	public void removeFromErrorList(DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		mErrorList.remove(downloadObject);
 	}
 
 	/**
@@ -111,28 +120,45 @@ public class DownloadManager implements DownloadProgressObserver, DownloadStatus
 	 * @param URL The url at which the download is located.
 	 */
 	public DownloadObject addDownload(String URL) throws MalformedURLException {
-		boolean valid = true; // if url is valid;
-		if (!valid) {
+		URL verifiedURL = verifyUrl(URL);
+		if (verifiedURL == null) {
 			throw new MalformedURLException("The URL is not a valid URL");
 		}
-		DownloadObject downloadObject = new DownloadObject("C:/downloads/image.jpg", new HTTPDownloadConnection(URL));
+		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
 		mInactiveList.add(downloadObject);
-		downloadObject.addProgressListener(this);
-		downloadObject.addStatusStateListener(this);
+		downloadObject.addListener(this);
 		return downloadObject;
 	}
 
-	/**
-	 * @see DownloadProgressObserver
-	 */
-	public void downloadProgressEventPerformed(DownloadProgressEvent downloadProgressEvent) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	private URL verifyUrl(String url) {
+		// Only allow HTTP URLs.
+		if (!url.toLowerCase().startsWith("http://")) {
+			return null;
+		}
+		// Verify format of URL.
+		URL verifiedUrl = null;
+		try {
+			verifiedUrl = new URL(url);
+		} catch (Exception e) {
+			return null;
+		}
+		// Make sure URL specifies a file.
+		if (verifiedUrl.getFile().length() < 2) {
+			return null;
+		}
+		return verifiedUrl;
 	}
 
-	/**
-	 * @see DownloadStatusStateObserver
-	 */
-	public void downloadStatusStateEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void downloadEventPerformed(DownloadProgressEvent downloadProgressEvent) {
+		if (downloadProgressEvent.getPercentDownloaded() == 100) {
+			DownloadObject downloadObject = downloadProgressEvent.getDownloadObject();
+			DownloadStatusStateEvent statusStateEvent = new DownloadStatusStateEvent(new CompletedState(downloadObject));
+			downloadObject.notifyListeners(statusStateEvent);
+		}
+	}
+
+	public void downloadEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
+		DownloadObject downloadObject = downloadStatusStateEvent.getDownloadObject();
+		downloadObject.setStatusState(downloadStatusStateEvent.getNewStatusState());
 	}
 }

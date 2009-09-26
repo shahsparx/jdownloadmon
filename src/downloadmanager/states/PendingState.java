@@ -1,4 +1,6 @@
-package downloadmanager;
+package downloadmanager.states;
+
+import downloadmanager.*;
 
 /**
  * A pending state is a "waiting to be active" state.
@@ -15,12 +17,17 @@ public class PendingState extends StatusState {
 	}
 
 	@Override
-	public StatusState getShallowCopy() {
-		return new PendingState(null);
+	public void download() {
+		//do nothing, in pending mode already.
 	}
 
 	@Override
-	public void setStatusState(StatusState state, DownloadObject downloadObject) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void changeFrom() {
+		DownloadManager.INSTANCE.removeFromPendingList(mDownloadObject);
+	}
+
+	@Override
+	public boolean changeTo() {
+		return DownloadManager.INSTANCE.addToPendingList(mDownloadObject);
 	}
 }

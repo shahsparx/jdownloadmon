@@ -1,5 +1,8 @@
 package downloadmanager;
 
+import java.io.IOException;
+import java.net.URL;
+
 /**
  * A download connection is for connecting to and getting bytes from a server.
  * @author Edward Larsson (edward.larsson@gmx.com)
@@ -7,35 +10,39 @@ package downloadmanager;
 public abstract class DownloadConnection {
 
 	/** The URL of the server this connection connects to. */
-	protected String mURL;
+	protected URL mURL;
 
 	/**
 	 * Construct a download connection.
 	 * @param URL The URL to connect to.
 	 */
-	protected DownloadConnection(String URL) {
-		mURL = URL;
+	protected DownloadConnection(URL url) {
+		mURL = url;
 	}
 
 	/**
 	 * Get the URL of this connection.
 	 * @return The URL of this connection.
 	 */
-	public String getURL() {
+	public URL getURL() {
 		return mURL;
 	}
 
 	/**
-	 * Get some bytes from the server.
+	 * Retrieve a set amount of bytes from the server.
 	 * @param position The position to start from.
-	 * @param size How many bytes to get.
-	 * @return an array of the bytes.
+	 * @param bufferSize Max buffer size.
+	 * @param totalSize The total size of the download.
+	 * @return A byte array with the requested bytes.
+	 * @throws java.io.IOException If there was an error retrieving the bytes.
 	 */
-	public abstract int[] getBytes(int position, int size);
+	public abstract byte[] getBytes(long position, int bufferSize, long totalSize) throws java.io.IOException;
 
 	/**
 	 * Connect to the server.
 	 * @throws UnableToConnectException if the connection was unsuccessful.
 	 */
-	public abstract void connect() throws UnableToConnectException;
+	public abstract int connect() throws UnableToConnectException;
+
+	public abstract void close();
 }
