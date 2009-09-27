@@ -1,5 +1,6 @@
 package downloadmanager;
 
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -17,17 +18,22 @@ public class FTPDownloadConnection extends DownloadConnection {
 	}
 
 	@Override
-	public int connect() throws UnableToConnectException {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public byte[] getBytes(long position, int bufferSize, long totalSize) {
+	public byte[] getBytes(long downloaded, long totalSize, int bufferSize) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public void close() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public int getSingleByte() throws IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public int connect(long downloaded) throws UnableToConnectException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

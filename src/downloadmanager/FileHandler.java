@@ -13,8 +13,9 @@ public class FileHandler {
 
 	private RandomAccessFile mFile;
 
-	public FileHandler(URL url) throws FileNotFoundException, IOException {
+	public FileHandler(URL url, long position) throws FileNotFoundException, IOException {
 		mFile = new RandomAccessFile(getFileName(url), "rw");
+		mFile.seek(position);
 	}
 
 	private String getFileName(URL url) {
@@ -22,9 +23,17 @@ public class FileHandler {
 		return fileName.substring(fileName.lastIndexOf('/') + 1);
 	}
 
-	public void write(byte[] buffer, long downloaded) throws IOException {
+	public void writeByte(int b) throws IOException {
+		mFile.write(b);
+	}
+
+	public void write(byte[] buffer) throws IOException {
 		mFile.write(buffer);
 	}
+
+
+
+
 
 	public void close() {
 		if (mFile != null) {

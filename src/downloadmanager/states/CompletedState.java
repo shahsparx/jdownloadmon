@@ -30,4 +30,9 @@ public class CompletedState extends StatusState {
 	public boolean changeTo() {
 		return DownloadManager.INSTANCE.addToCompletedList(mDownloadObject);
 	}
+
+	@Override
+	public void stop() {
+		//do nothing
+	}
 }

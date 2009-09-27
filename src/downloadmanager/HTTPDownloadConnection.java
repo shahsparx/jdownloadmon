@@ -23,12 +23,13 @@ public class HTTPDownloadConnection extends DownloadConnection {
 	}
 
 	@Override
-	public byte[] getBytes(long position, int bufferSize, long totalSize) throws java.io.IOException {
-		byte buffer[];
-		if (totalSize - position >= bufferSize) {
+	public byte[] getBytes(long downloaded, long totalSize, int bufferSize) throws java.io.IOException {
+		byte[] buffer;
+		
+		if (totalSize - downloaded > bufferSize) {
 			buffer = new byte[bufferSize];
 		} else {
-			buffer = new byte[(int) (totalSize - position)];
+			buffer = new byte[(int) (totalSize - downloaded)];
 		}
 
 		int read = mStream.read(buffer);
@@ -36,7 +37,16 @@ public class HTTPDownloadConnection extends DownloadConnection {
 		if (read == -1) {
 			throw new java.io.IOException("Stream read error");
 		}
+
 		return buffer;
+	}
+
+	public int getSingleByte() throws IOException {
+		int read = mStream.read();
+		if (read == -1) {
+			throw new java.io.IOException("Stream read error");
+		}
+		return read;
 	}
 
 	/*private class MyAuthenticator extends Authenticator {
@@ -51,19 +61,12 @@ public class HTTPDownloadConnection extends DownloadConnection {
 	}*/
 
 	@Override
-	public int connect() throws UnableToConnectException {
+	public int connect(long downloaded) throws UnableToConnectException {
 		try {
-			System.out.println("connecting");
-			/*System.setProperty("http.proxySet", "true");
-			System.setProperty("http.proxyHost", "proxy.student.jenseneducation.se");
-			System.setProperty("http.proxyPort", "8080");
-			System.setProperty("http.proxyType", "4");
-			Authenticator.setDefault(new MyAuthenticator());
-			 */
-
 			mConnection = (HttpURLConnection) mURL.openConnection();
 			mConnection.connect();
 			mStream = mConnection.getInputStream();
+			mStream.skip(downloaded);
 			return mConnection.getContentLength();
 		} catch (IOException ex) {
 			throw new UnableToConnectException(ex.getMessage());
@@ -75,6 +78,7 @@ public class HTTPDownloadConnection extends DownloadConnection {
 		if (mStream != null) {
 			try {
 				mStream.close();
+				mConnection.disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

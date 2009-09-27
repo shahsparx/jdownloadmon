@@ -152,13 +152,13 @@ public class DownloadManager implements DownloadObserver {
 	public void downloadEventPerformed(DownloadProgressEvent downloadProgressEvent) {
 		if (downloadProgressEvent.getPercentDownloaded() == 100) {
 			DownloadObject downloadObject = downloadProgressEvent.getDownloadObject();
-			DownloadStatusStateEvent statusStateEvent = new DownloadStatusStateEvent(new CompletedState(downloadObject));
-			downloadObject.notifyListeners(statusStateEvent);
+			downloadObject.setStatusState(new CompletedState(downloadObject));
 		}
 	}
 
 	public void downloadEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
-		DownloadObject downloadObject = downloadStatusStateEvent.getDownloadObject();
-		downloadObject.setStatusState(downloadStatusStateEvent.getNewStatusState());
+		if (downloadStatusStateEvent.getNewStatusState() instanceof CompletedState) {
+			
+		}
 	}
 }

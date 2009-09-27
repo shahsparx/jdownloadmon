@@ -32,6 +32,11 @@ public abstract class StatusState {
 	public abstract void download();
 
 	/**
+	 * Try to stop downloading.
+	 */
+	public abstract void stop();
+
+	/**
 	 * Change a download object from this status state to another.
 	 * @param state The status state to change to.
 	 */
@@ -54,4 +59,6 @@ public abstract class StatusState {
 	 * @return <tt>true</tt> the change was successful, <tt>false</tt> otherwise.
 	 */
 	public abstract boolean changeTo();
+
+	
 }
