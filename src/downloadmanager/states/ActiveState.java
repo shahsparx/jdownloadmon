@@ -16,17 +16,28 @@ public class ActiveState extends StatusState {
 	}
 
 	@Override
-	public void download() {
-		// do nothing, already active
-	}
-
-	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromActiveList(mDownloadObject);
 	}
 
 	@Override
 	public boolean changeTo() {
-		return DownloadManager.INSTANCE.addToActiveList(mDownloadObject);
+		if (DownloadManager.INSTANCE.addToActiveList(mDownloadObject)) {
+			Thread t = new Thread(mDownloadObject);
+			t.start();
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public void download() {
+		//do nothing, already active
+	}
+
+	@Override
+	public void stop() {
+		mDownloadObject.setStatusState(new InactiveState(mDownloadObject));
 	}
 }

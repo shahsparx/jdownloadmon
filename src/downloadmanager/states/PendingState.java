@@ -30,4 +30,9 @@ public class PendingState extends StatusState {
 	public boolean changeTo() {
 		return DownloadManager.INSTANCE.addToPendingList(mDownloadObject);
 	}
+
+	@Override
+	public void stop() {
+		mDownloadObject.setStatusState(new InactiveState(mDownloadObject));
+	}
 }

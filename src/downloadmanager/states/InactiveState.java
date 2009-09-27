@@ -18,8 +18,7 @@ public class InactiveState extends StatusState {
 
 	@Override
 	public void download() {
-		Thread t = new Thread(mDownloadObject);
-		t.start();
+		mDownloadObject.setStatusState(new ActiveState(mDownloadObject));
 	}
 
 	@Override
@@ -30,5 +29,10 @@ public class InactiveState extends StatusState {
 	@Override
 	public boolean changeTo() {
 		return DownloadManager.INSTANCE.addToInactiveList(mDownloadObject);
+	}
+
+	@Override
+	public void stop() {
+		//do nothing, already inactive
 	}
 }

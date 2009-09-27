@@ -46,37 +46,26 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	}
 
 	/**
-	 * Try to start the download.
-	 */
-	public void download() {
-		mStatusState.download();
-	}
-
-	/**
 	 * @see Runnable#run()
 	 */
 	public void run() {
 		try {
-			mSize = mDownloadConnection.connect();
-			mFileHandler = new FileHandler(mDownloadConnection.getURL());
-			notifyListeners(new DownloadStatusStateEvent(new ActiveState(this)));
-				while (mStatusState instanceof ActiveState) {
-					byte[] bytes = mDownloadConnection.getBytes(mDownloadedSize, BUFFER_SIZE, mSize);
-					mFileHandler.write(bytes, mDownloadedSize);
-					mDownloadedSize += bytes.length;
-					notifyListeners(new DownloadProgressEvent(this));
-					// TODO this code is to be organized by downloadmanager:
-					//if (mDownloadedSize == mSize) {
-					//	setStatusState(new CompletedState(this));
-					//	break;
-					//}
+			mSize = mDownloadConnection.connect(mDownloadedSize);
+			mFileHandler = new FileHandler(mDownloadConnection.getURL(), mDownloadedSize);
+			while (mStatusState instanceof ActiveState) {
+				/**byte[] bytes = mDownloadConnection.getBytes(mDownloadedSize, mSize, BUFFER_SIZE);
+				mFileHandler.write(bytes);
+				mDownloadedSize += bytes.length;*/
+				mFileHandler.writeByte(mDownloadConnection.getSingleByte());
+				mDownloadedSize++;
+				notifyListeners(new DownloadProgressEvent(this));
 				}
 		} catch (Exception ex) {
-			notifyListeners(new DownloadStatusStateEvent(new ErrorState(this, ex.getMessage())));
+			setStatusState(new ErrorState(this, ex.getMessage()));
 			ex.printStackTrace();
 		} finally {
-			mDownloadConnection.close();
 			mFileHandler.close();
+			mDownloadConnection.close();
 		}
 	}
 
@@ -102,11 +91,10 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 */
 	public void setStatusState(StatusState state) {
 		if (mStatusState.changeTo(state)) {
-			mStatusState = state;
-		} else {
-			DownloadStatusStateEvent event = new DownloadStatusStateEvent(mStatusState);
+			DownloadStatusStateEvent event = new DownloadStatusStateEvent(state);
 			notifyListeners(event);
-		}
+			mStatusState = state;
+		} 
 	}
 
 	/**
@@ -146,6 +134,10 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	}
 
 	public void stop() {
-		throw new UnsupportedOperationException("Not yet implemented");
+		mStatusState.stop();
+	}
+
+	public void download() {
+		mStatusState.download();
 	}
 }
