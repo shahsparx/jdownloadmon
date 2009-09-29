@@ -1,10 +1,8 @@
 package downloadmanager.gui.viewStates;
 
 import downloadmanager.gui.*;
-import java.awt.Component;
 import javax.swing.ImageIcon;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
+
 
 /**
  *
@@ -31,6 +29,13 @@ public abstract class ViewState {
 
 	@Override
 	public abstract String toString();
+
+	/**
+	 * @return The text that is to be displayed on the tooltip.
+	 */
+	public String getToolTipText() {
+		return toString();
+	}
 
 	//TODO inside DownloadObjects run method is a check to see if download is completed and then run changeState which notifies listeners.
 	//TODO Use if else if for now to determine which viewstate to use with which statustate on downloadStateevent.

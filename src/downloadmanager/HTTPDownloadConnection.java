@@ -11,7 +11,9 @@ import java.net.URL;
  */
 public class HTTPDownloadConnection extends DownloadConnection {
 
+	/** The input stream used to read bytes from the server. */
 	InputStream mStream;
+	/** The actual HTTP connection. */
 	HttpURLConnection mConnection;
 
 	/**
@@ -23,24 +25,34 @@ public class HTTPDownloadConnection extends DownloadConnection {
 	}
 
 	@Override
-	public byte[] getBytes(long downloaded, long totalSize, int bufferSize) throws java.io.IOException {
+	public byte[] getBytes(long downloaded, long totalSize, int bufferSize) throws java.io.IOException, InterruptedException {
 		byte[] buffer;
+		int readSize;
 		
 		if (totalSize - downloaded > bufferSize) {
-			buffer = new byte[bufferSize];
+			readSize = bufferSize;
 		} else {
-			buffer = new byte[(int) (totalSize - downloaded)];
+			readSize = (int) (totalSize - downloaded);
 		}
 
+		// Check if there is sufficient data downloaded
+		while (mStream.available() < readSize) {
+			Thread.sleep(10); // sleep if not yet ready
+		}
+		
+		// read
+		buffer = new byte[readSize];
 		int read = mStream.read(buffer);
 
+		// Finally, check to make sure something actually got read.
 		if (read == -1) {
-			throw new java.io.IOException("Stream read error");
+			throw new IOException("Stream read error");
 		}
 
 		return buffer;
 	}
 
+	@Override
 	public int getSingleByte() throws IOException {
 		int read = mStream.read();
 		if (read == -1) {
@@ -49,28 +61,13 @@ public class HTTPDownloadConnection extends DownloadConnection {
 		return read;
 	}
 
-	/*private class MyAuthenticator extends Authenticator {
-
-		public MyAuthenticator() {
-		}
-
-		protected PasswordAuthentication getPasswordAuthentication() {
-			System.out.println("getPasswordAuthentication() called for https connection!!!");
-			return new PasswordAuthentication("EdLa_ookaug08", "Zkelet4r6".toCharArray());
-		}
-	}*/
-
 	@Override
-	public int connect(long downloaded) throws UnableToConnectException {
-		try {
+	public int connect(long downloaded) throws IOException {
 			mConnection = (HttpURLConnection) mURL.openConnection();
 			mConnection.connect();
 			mStream = mConnection.getInputStream();
 			mStream.skip(downloaded);
 			return mConnection.getContentLength();
-		} catch (IOException ex) {
-			throw new UnableToConnectException(ex.getMessage());
-		}
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
 
 /**
  * A download queue for the gui to show the list of download objects.
@@ -60,19 +61,18 @@ public class DownloadQueue extends JTable implements ActionListener {
 
 	/**
 	 * Add a download view to the table.
-	 * @param downloadComponent The download view to add.
+	 * @param downloadView The download view to add.
 	 */
 	public void addDownloadView(DownloadView downloadView) {
 		mDownloadViews.put(downloadView.getDownloadObject(), downloadView);
 		mTableModel.addDownloadView(downloadView);
 	}
-
 	/**
 	 * Remove a download view from the table.
-	 * @param downloadComponent The download view to remove.
+	 * @param downloadObject The download object linked to the download view to remove.
 	 */
-	public void removeDownload(DownloadView downloadView) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void removeDownloadView(DownloadObject downloadObject) {
+		mDownloadViews.remove(downloadObject);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		} else if (statusState instanceof CompletedState) {
 			view.setViewState(new CompletedViewState());
 		} else if (statusState instanceof ErrorState) {
-			view.setViewState(new ErrorViewState());
+			view.setViewState(new ErrorViewState(((ErrorState)statusState).getErrorMessage()));
 		}
 
 		this.repaint();
@@ -109,7 +109,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 
 	/**
 	 * Get the download view linked to a certain download object.
-	 * @param The download object linked to the download view.
+	 * @param downloadObject The download object linked to the download view.
 	 * @return downloadView The download view linked to the download object.
 	 */
 	public DownloadView getDownloadView(DownloadObject downloadObject) {
@@ -137,17 +137,21 @@ public class DownloadQueue extends JTable implements ActionListener {
 				view.getDownloadObject().stop();
 			}
 		} else if (source.equals(GUI.INSTANCE.getRemoveButton())) {
-			for (DownloadView view : views) {
-				view.getDownloadObject().stop();
-				// remove from downloadmanager and table
+			while (getSelectedRowCount() > 0) {
+				int row = getSelectedRow();
+				DownloadView view = (DownloadView) getValueAt(row, column);
+				DownloadObject downloadObject = view.getDownloadObject();
+				downloadObject.remove();
+				removeDownloadView(downloadObject);
+				mTableModel.removeRow(row);
 			}
 		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
 			for (DownloadView view : views) {
-				// move stuff up
+				// TODO move stuff up
 			}
 		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {
 			for (DownloadView view : views) {
-				// move stuff down
+				// TODO move stuff down
 			}
 		}
 	}

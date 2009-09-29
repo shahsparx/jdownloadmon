@@ -14,10 +14,19 @@ public abstract class DownloadConnection {
 
 	/**
 	 * Construct a download connection.
-	 * @param URL The URL to connect to.
+	 * @param url The URL to connect to.
 	 */
 	protected DownloadConnection(URL url) {
 		mURL = url;
+	}
+	
+	/**
+	 * Get a file's filename from this connection's url.
+	 * @return The file's filename as a String.
+	 */
+	public String getFileName() {
+		String fileName = mURL.getFile();
+		return fileName.substring(fileName.lastIndexOf('/') + 1);
 	}
 
 	/**
@@ -28,24 +37,34 @@ public abstract class DownloadConnection {
 		return mURL;
 	}
 
+	/**
+	 * Retrieve a single byte from the server.
+	 * @return The requested byte as an <tt>int</tt>.
+	 * @throws IOException if there was an error retrieving the byte.
+	 */
 	public abstract int getSingleByte() throws IOException;
 
 	/**
 	 * Retrieve a set amount of bytes from the server.
-	 * @param position The position to start from.
+	 * @param downloaded The position to start from.
 	 * @param bufferSize Max buffer size.
 	 * @param totalSize The total size of the download.
 	 * @return A byte array with the requested bytes.
-	 * @throws java.io.IOException If there was an error retrieving the bytes.
+	 * @throws IOException if there was an error retrieving the bytes.
+	 * @throws InterruptedException if thread was interrupted while trying to sleep.
 	 */
-	public abstract byte[] getBytes(long downloaded, long totalSize, int bufferSize) throws java.io.IOException;
+	public abstract byte[] getBytes(long downloaded, long totalSize, int bufferSize) throws IOException, InterruptedException;
 
 	/**
 	 * Connect to the server.
-	 * @param downloaded How much to skip (i.e how much is already downloaded).
-	 * @throws UnableToConnectException if the connection was unsuccessful.
+	 * @param downloadedSize How much is already downloaded.
+	 * @return The full size of the file that's to be downloaded.
+	 * @throws IOException if the connection was unsuccessful.
 	 */
-	public abstract int connect(long downloaded) throws UnableToConnectException;
+	public abstract int connect(long downloadedSize) throws IOException;
 
+	/**
+	 * Close the connection and any associated streams.
+	 */
 	public abstract void close();
 }

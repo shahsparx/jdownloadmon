@@ -24,6 +24,7 @@ public class DownloadView implements TableCellRenderer {
 	/**
 	 * Construct a download component.
 	 * @param downloadObject The download object to be viewed.
+	 * @param viewStateRenderer The renderer used to render the view state.
 	 */
 	public DownloadView (DownloadObject downloadObject, ViewStateRenderer viewStateRenderer) {
 		mDownloadObject =  downloadObject;
@@ -45,12 +46,10 @@ public class DownloadView implements TableCellRenderer {
 	 * @return The file name and extension of the download object as a <tt>String</tt>.
 	 */
 	public String getFileName() {
-		return "new file";
+		String[] path = mDownloadObject.getDestination().split("/");
+		return path[path.length-1];
 	}
 
-	/**
-	 * @see TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int) 
-	 */
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		DownloadView v = (DownloadView) value;
 		return v.mProgressBar;
@@ -78,5 +77,9 @@ public class DownloadView implements TableCellRenderer {
 	 */
 	public DownloadObject getDownloadObject() {
 		return mDownloadObject;
+	}
+
+	void remove() {
+		mDownloadObject = null;
 	}
 }

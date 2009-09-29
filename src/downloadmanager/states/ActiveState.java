@@ -18,6 +18,7 @@ public class ActiveState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromActiveList(mDownloadObject);
+		mDownloadObject = null;
 	}
 
 	@Override
@@ -28,6 +29,7 @@ public class ActiveState extends StatusState {
 			return true;
 		}
 
+		mDownloadObject.setStatusState(new PendingState(mDownloadObject));
 		return false;
 	}
 

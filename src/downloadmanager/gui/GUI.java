@@ -7,13 +7,26 @@ import downloadmanager.DownloadObserver;
 import downloadmanager.events.DownloadStatusStateEvent;
 import downloadmanager.gui.viewStates.ViewStateRenderer;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.util.ArrayList;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JToolBar.Separator;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 
 /**
  * The GUI for the Download Manager.
@@ -116,10 +129,13 @@ public class GUI implements DownloadObserver {
 		topButtonsPanel.add(mStopButton);
 		topButtonsPanel.add(mRemoveButton);
 
+		JPanel bottomPanel = new JPanel();
 		JPanel bottomButtonsPanel = new JPanel();
 		bottomButtonsPanel.setLayout(new FlowLayout());
 		bottomButtonsPanel.add(mMoveUpQueueButton);
 		bottomButtonsPanel.add(mMoveDownQueueButton);
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+		bottomPanel.add(bottomButtonsPanel);
 
 		JPanel middlePanel = new JPanel();
 		JScrollPane pane = new JScrollPane(mQueue);
@@ -130,8 +146,15 @@ public class GUI implements DownloadObserver {
 		
 		content.add(topButtonsPanel, BorderLayout.NORTH);
 		content.add(middlePanel, BorderLayout.CENTER);
-		content.add(bottomButtonsPanel, BorderLayout.SOUTH);
-		
+		content.add(bottomPanel, BorderLayout.SOUTH);
+
+		JMenuBar bar = new JMenuBar();
+		JMenu menu = new JMenu("Options");
+		JMenuItem item = new JMenuItem("D");
+		menu.add(item);
+		bar.add(menu);
+		frame.setJMenuBar(bar);
+
 		frame.pack();
 		frame.setLocation(200, 200);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

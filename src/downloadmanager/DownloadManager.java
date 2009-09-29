@@ -2,7 +2,9 @@ package downloadmanager;
 
 import downloadmanager.events.DownloadStatusStateEvent;
 import downloadmanager.events.DownloadProgressEvent;
+import downloadmanager.states.ActiveState;
 import downloadmanager.states.CompletedState;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -42,6 +44,8 @@ public class DownloadManager implements DownloadObserver {
 	/**
 	 * Tries to add a download object to the active list.
 	 * Will not work if the max number of downloads is already reached.
+	 * @param downloadObject The download object to be added to the list.
+	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToActiveList(DownloadObject downloadObject) {
 		if (mActiveList.size() >= mMaxDownloads) {
@@ -54,6 +58,8 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Tries to add a download object to the inactive list.
+	 * @param downloadObject The download object to be added to the list.
+	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToInactiveList(DownloadObject downloadObject) {
 		return mInactiveList.add(downloadObject);
@@ -61,6 +67,8 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Tries to add a download object to the pending list.
+	 * @param downloadObject The download object to be added to the list.
+	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToPendingList(DownloadObject downloadObject) {
 	return mPendingList.add(downloadObject);
@@ -68,6 +76,8 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Tries to add a download object to the completed list.
+	 * @param downloadObject The download object to be added to the list.
+	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToCompletedList(DownloadObject downloadObject) {
 		return mCompletedList.add(downloadObject);
@@ -75,6 +85,8 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Tries to add a download object to the error list.
+	 * @param downloadObject The download object to be added to the list.
+	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToErrorList(DownloadObject downloadObject) {
 		return mErrorList.add(downloadObject);
@@ -82,6 +94,7 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Removes a download from the active list.
+	 * @param downloadObject The download object to be removed from the list.
 	 */
 	public void removeFromActiveList(DownloadObject downloadObject) {
 		mActiveList.remove(downloadObject);
@@ -89,6 +102,7 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Removes a download from the inactive list.
+	 * @param downloadObject The download object to be removed from the list.
 	 */
 	public void removeFromInactiveList(DownloadObject downloadObject) {
 		mInactiveList.remove(downloadObject);
@@ -96,6 +110,7 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Removes a download from the pending list.
+	 * @param downloadObject The download object to be removed from the list.
 	 */
 	public void removeFromPendingList(DownloadObject downloadObject) {
 		mPendingList.remove(downloadObject);
@@ -103,6 +118,7 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Removes a download from the completed list.
+	 * @param downloadObject The download object to be removed from the list.
 	 */
 	public void removeFromCompletedList(DownloadObject downloadObject) {
 		mCompletedList.remove(downloadObject);
@@ -110,6 +126,7 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Removes a download from the error list.
+	 * @param downloadObject The download object to be removed from the list.
 	 */
 	public void removeFromErrorList(DownloadObject downloadObject) {
 		mErrorList.remove(downloadObject);
@@ -118,6 +135,8 @@ public class DownloadManager implements DownloadObserver {
 	/**
 	 * Add a download to the download manager.
 	 * @param URL The url at which the download is located.
+	 * @return The download object that was added.
+	 * @throws MalformedURLException if the URL is not a valid URL.
 	 */
 	public DownloadObject addDownload(String URL) throws MalformedURLException {
 		URL verifiedURL = verifyUrl(URL);
@@ -157,8 +176,10 @@ public class DownloadManager implements DownloadObserver {
 	}
 
 	public void downloadEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
-		if (downloadStatusStateEvent.getNewStatusState() instanceof CompletedState) {
-			
+		// if an active download has stopped downloading, activate top pending download.
+		if (mPendingList.size() > 0 && downloadStatusStateEvent.getStatusState() instanceof ActiveState) {
+			DownloadObject pending = mPendingList.get(0);
+			pending.setStatusState(new ActiveState(pending));
 		}
 	}
 }

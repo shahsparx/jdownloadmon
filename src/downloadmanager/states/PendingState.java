@@ -24,6 +24,7 @@ public class PendingState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromPendingList(mDownloadObject);
+		mDownloadObject = null;
 	}
 
 	@Override

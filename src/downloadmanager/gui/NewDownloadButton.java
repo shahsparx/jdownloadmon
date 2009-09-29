@@ -16,7 +16,8 @@ public class NewDownloadButton extends Button {
 
     /**
      * Construct a new download button.
-     * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
+	 * @param button The JButton wrapped in this button.
+	 * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
      */
     public NewDownloadButton(JButton button) {
         super(button);

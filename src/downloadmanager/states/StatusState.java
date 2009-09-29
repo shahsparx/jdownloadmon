@@ -37,11 +37,12 @@ public abstract class StatusState {
 	public abstract void stop();
 
 	/**
-	 * Change a download object from this status state to another.
+	 * Change a download object's state from this status state to another.
 	 * @param state The status state to change to.
+	 * @return <tt>true</tt> if the change was successful, <tt>false</tt> if the state could not be changed.
 	 */
 	public boolean changeTo(StatusState state) {
-		if (state.changeTo()) {
+		if (mDownloadObject != null && state.changeTo()) {
 			mDownloadObject.getStatusState().changeFrom();
 			return true;
 		}
@@ -60,5 +61,10 @@ public abstract class StatusState {
 	 */
 	public abstract boolean changeTo();
 
-	
+	/**
+	 * Remove a download object from the download manager.
+	 */
+	public void remove() {
+		changeFrom();
+	}
 }

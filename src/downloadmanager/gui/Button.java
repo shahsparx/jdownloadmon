@@ -17,7 +17,6 @@ public abstract class Button implements ActionListener {
     /**
      * Construct a button.
      * @param button The JButton used in this button.
-     * @param downloadManager The download manager to perform actions on.
      */
     protected Button(JButton button) {
 	mButton = button;
@@ -29,9 +28,6 @@ public abstract class Button implements ActionListener {
      */
     public abstract void push();
 
-	/**
-	 * @see ActionListener#actionPerformed(java.awt.event.ActionEvent) 
-	 */
 	public void actionPerformed(ActionEvent ae) {
 		push();
 	}

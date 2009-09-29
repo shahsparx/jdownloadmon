@@ -11,7 +11,7 @@ public class FTPDownloadConnection extends DownloadConnection {
 
 	/**
 	 * Construct a FTP download connection.
-	 * @param URL The FTP server's url.
+	 * @param url The FTP server's url.
 	 */
 	public FTPDownloadConnection(URL url) {
 		super(url);
@@ -33,7 +33,7 @@ public class FTPDownloadConnection extends DownloadConnection {
 	}
 
 	@Override
-	public int connect(long downloaded) throws UnableToConnectException {
+	public int connect(long downloadedSize) throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }
