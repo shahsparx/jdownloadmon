@@ -16,7 +16,7 @@ public class DownloadStatusStateEvent extends DownloadEvent {
 
 	/**
 	 * Construct a download status state event.
-	 * @param downloadObject The download object asoociated with this event.
+	 * @param newStatusState The new status state the download object wants to change to.
 	 */
 	public DownloadStatusStateEvent(StatusState newStatusState) {
 		super(newStatusState.getDownloadObject());

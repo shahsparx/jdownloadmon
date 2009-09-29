@@ -24,6 +24,7 @@ public class InactiveState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromInactiveList(mDownloadObject);
+		mDownloadObject = null;
 	}
 
 	@Override

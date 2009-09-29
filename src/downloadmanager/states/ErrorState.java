@@ -36,6 +36,7 @@ public class ErrorState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromErrorList(mDownloadObject);
+		mDownloadObject = null;
 	}
 
 	@Override

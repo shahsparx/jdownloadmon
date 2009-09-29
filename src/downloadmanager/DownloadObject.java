@@ -18,7 +18,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	/** Buffer size. */
 	private static final int BUFFER_SIZE = 1024;
 	/** Default directory location */
-	private static final String DEFAULT_DIRECTORY = "C:/Downloads/";
+	private static final String DEFAULT_DIRECTORY = "C:/downloads/";
 	/** List of progress observers observing this download object. */
 	private ArrayList<DownloadObserver> mObservers;
 	/** The download file's destionation. */
@@ -32,17 +32,18 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	/** The connection to the server. */
 	private DownloadConnection mDownloadConnection;
 	/** File handler to write and read files on system. */
-	private FileHandler mFileHandler;
+	private DownloadFile mDownloadFile;
 
 	/**
 	 * Construct a download object.
-	 * @param destination Where to put the file on the drive.
 	 * @param connection The download connection to use for downloading.
 	 */
 	public DownloadObject(DownloadConnection connection) {
 		mDownloadConnection = connection;
 		mObservers = new ArrayList<DownloadObserver>();
 		mStatusState = new InactiveState(this);
+		mDestination = DEFAULT_DIRECTORY + mDownloadConnection.getFileName();
+		mDownloadedSize = DownloadFile.getFileLength(mDestination);
 	}
 
 	/**
@@ -50,21 +51,21 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 */
 	public void run() {
 		try {
+			mDownloadFile = new DownloadFile(mDestination, mDownloadedSize);
 			mSize = mDownloadConnection.connect(mDownloadedSize);
-			mFileHandler = new FileHandler(mDownloadConnection.getURL(), mDownloadedSize);
+			// if file is completed, set state to completed by notifying download manager of the size
+			// download manager will set state and the while loop will be skipped.
+			notifyListeners(new DownloadProgressEvent(this));
 			while (mStatusState instanceof ActiveState) {
-				/**byte[] bytes = mDownloadConnection.getBytes(mDownloadedSize, mSize, BUFFER_SIZE);
-				mFileHandler.write(bytes);
-				mDownloadedSize += bytes.length;*/
-				mFileHandler.writeByte(mDownloadConnection.getSingleByte());
-				mDownloadedSize++;
+				byte[] bytes = mDownloadConnection.getBytes(mDownloadedSize, mSize, BUFFER_SIZE);
+				mDownloadFile.write(bytes);
+				mDownloadedSize += bytes.length;
 				notifyListeners(new DownloadProgressEvent(this));
-				}
+			}
 		} catch (Exception ex) {
-			setStatusState(new ErrorState(this, ex.getMessage()));
-			ex.printStackTrace();
+			setStatusState(new ErrorState(this, ex.toString()));
 		} finally {
-			mFileHandler.close();
+			mDownloadFile.close();
 			mDownloadConnection.close();
 		}
 	}
@@ -94,7 +95,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
 			DownloadStatusStateEvent event = new DownloadStatusStateEvent(state);
 			notifyListeners(event);
 			mStatusState = state;
-		} 
+		}
 	}
 
 	/**
@@ -133,11 +134,25 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		}
 	}
 
+	/**
+	 * Try to stop this download from downloading.
+	 */
 	public void stop() {
 		mStatusState.stop();
 	}
 
+	/**
+	 * Try to start this download.
+	 */
 	public void download() {
 		mStatusState.download();
+	}
+
+	/**
+	 * Remove this download.
+	 */
+	public void remove() {
+		stop();
+		mStatusState.remove();
 	}
 }

@@ -2,7 +2,6 @@ package downloadmanager.gui;
 
 import downloadmanager.DownloadManager;
 import downloadmanager.DownloadObject;
-import downloadmanager.MalformedURLException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.JButton;
@@ -28,6 +27,7 @@ public class AddDownloadButton extends Button {
 	 * Construct an add download button.
 	 * @param button The add download JButton.
 	 * @param addDownloadBox The add download box this button resides in.
+	 * @param frame The JFrame this button is in.
 	 */
 	public AddDownloadButton(JButton button, AddDownloadBox addDownloadBox, JFrame frame) {
 		super(button);
@@ -49,7 +49,7 @@ public class AddDownloadButton extends Button {
 			DownloadObject dO = DownloadManager.INSTANCE.addDownload(mAddDownloadBox.getURLTextField().getText());
 			GUI.INSTANCE.addDownloadObject(dO);
 			mFrame.dispose();
-		} catch (MalformedURLException me) {
+		} catch (java.net.MalformedURLException me) {
 			mErrorLabel.setText(me.getMessage());
 			mErrorLabel.setVisible(true);
 		}

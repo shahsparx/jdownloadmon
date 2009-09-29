@@ -24,6 +24,7 @@ public class CompletedState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromCompletedList(mDownloadObject);
+		mDownloadObject = null;
 	}
 
 	@Override

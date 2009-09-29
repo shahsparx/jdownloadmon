@@ -16,10 +16,11 @@ public class AddDownloadBox {
 
 	/**
 	 * Construct an add download dialog box.
+	 * @param field The textfield that this download box uses.
 	 */
 	public AddDownloadBox(JTextField field) {
 		mURLTextField = field;
-		mURLTextField.setText("http://www.google.com/intl/en_ALL/images/logo.gif");
+		mURLTextField.setText("http://googleisagiantrobot.com/google-is-a-giant-robot.png");
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem item = new JMenuItem(new DefaultEditorKit.CutAction());
 		item.setText("Cut");
