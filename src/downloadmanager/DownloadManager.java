@@ -4,6 +4,7 @@ import downloadmanager.events.DownloadStatusStateEvent;
 import downloadmanager.events.DownloadProgressEvent;
 import downloadmanager.states.ActiveState;
 import downloadmanager.states.CompletedState;
+import downloadmanager.states.PendingState;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class DownloadManager implements DownloadObserver {
 	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToPendingList(DownloadObject downloadObject) {
-	return mPendingList.add(downloadObject);
+		return mPendingList.add(downloadObject);
 	}
 
 	/**
@@ -140,27 +141,27 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	public DownloadObject addDownload(String URL) throws MalformedURLException {
 		URL verifiedURL = verifyUrl(URL);
-		if (verifiedURL == null) {
-			throw new MalformedURLException("The URL is not a valid URL");
-		}
+
 		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
 		mInactiveList.add(downloadObject);
 		downloadObject.addListener(this);
 		return downloadObject;
 	}
 
-	private URL verifyUrl(String url) {
+	/**
+	 * Verify an URL.
+	 * @param url The String to verify as an url.
+	 * @return A new URL.
+	 * @throws MalformedURLException if the URL is not a valid URL.
+	 */
+	private URL verifyUrl(String url) throws MalformedURLException {
 		// Only allow HTTP URLs.
 		if (!url.toLowerCase().startsWith("http://")) {
 			return null;
 		}
 		// Verify format of URL.
 		URL verifiedUrl = null;
-		try {
-			verifiedUrl = new URL(url);
-		} catch (Exception e) {
-			return null;
-		}
+		verifiedUrl = new URL(url);
 		// Make sure URL specifies a file.
 		if (verifiedUrl.getFile().length() < 2) {
 			return null;
@@ -176,10 +177,114 @@ public class DownloadManager implements DownloadObserver {
 	}
 
 	public void downloadEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
+		updatePendingList();
+	}
+
+	/**
+	 * Check if there are pending downloads and if so move the top one up to the active list.
+	 */
+	private void updatePendingList() {
 		// if an active download has stopped downloading, activate top pending download.
-		if (mPendingList.size() > 0 && downloadStatusStateEvent.getStatusState() instanceof ActiveState) {
+		if (mPendingList.size() > 0 && mActiveList.size() < mMaxDownloads) {
 			DownloadObject pending = mPendingList.get(0);
 			pending.setStatusState(new ActiveState(pending));
 		}
+	}
+
+	/**
+	 * Get the queue position of an active download.
+	 * @param downloadObject The download object to get the queue position of.
+	 * @return the download's queue position.
+	 */
+	public String getActiveQueuePosition(DownloadObject downloadObject) {
+		return Integer.toString(mActiveList.indexOf(downloadObject) + 1);
+	}
+
+	/**
+	 * Get the queue position of a pending download.
+	 * @param downloadObject The download object to get the queue position of.
+	 * @return the download's queue position.
+	 */
+	public String getPendingQueuePosition(DownloadObject downloadObject) {
+		return Integer.toString(mActiveList.size() + mPendingList.indexOf(downloadObject) + 1);
+	}
+
+	/**
+	 * Move an active download up the active queue.
+	 * @param downloadObject The download object to move.
+	 */
+	public void moveActiveUp(DownloadObject downloadObject) {
+		int index = mActiveList.indexOf(downloadObject);
+		if (index != -1 && index != 0) {
+			DownloadObject d = mActiveList.get(index - 1);
+			mActiveList.set(index - 1, downloadObject);
+			mActiveList.set(index, d);
+		}
+	}
+
+	/**
+	 * Move a pending download down the pending queue.
+	 * @param downloadObject The download object to move.
+	 */
+	public void movePendingDown(DownloadObject downloadObject) {
+		int index = mPendingList.indexOf(downloadObject);
+		if (index != -1 && index != mPendingList.size() - 1) {
+			DownloadObject d = mPendingList.get(index + 1);
+			mPendingList.set(index + 1, downloadObject);
+			mPendingList.set(index, d);
+		}
+	}
+
+	/**
+	 * Move a pending download up the pending queue,
+	 * or up to the active queue if it's at the top of the pending queue.
+	 * @param downloadObject The download object to move.
+	 */
+	public void movePendingUp(DownloadObject downloadObject) {
+		int index = mPendingList.indexOf(downloadObject);
+		if (index != -1) {
+			if (index == 0) {
+				switchBottomActiveWithTopPending();
+			} else {
+				DownloadObject d = mPendingList.get(index - 1);
+				mPendingList.set(index - 1, downloadObject);
+				mPendingList.set(index, d);
+			}
+		}
+	}
+
+	/**
+	 * Move an active download down the active queue,
+	 * or down to the pending queue if it's at the bottom of the active queue.
+	 * @param downloadObject The download object to move.
+	 */
+	public void moveActiveDown(DownloadObject downloadObject) {
+		int index = mActiveList.indexOf(downloadObject);
+		if (index != -1) {
+			if (index == mActiveList.size() - 1) {
+				if (mPendingList.size() > 0) {
+					switchBottomActiveWithTopPending();
+				}
+			} else {
+				DownloadObject d = mActiveList.get(index + 1);
+				mActiveList.set(index + 1, downloadObject);
+				mActiveList.set(index, d);
+			}
+		}
+	}
+
+	/**
+	 * Switch the bottommost active download object with the topmost pending download object.
+	 */
+	private void switchBottomActiveWithTopPending() {
+		// move active first by setting it to pending.
+		DownloadObject bottomActive = mActiveList.get(mActiveList.size() - 1);
+		bottomActive.setStatusState(new PendingState(bottomActive));
+		// now the newly pending download will be added to the bottom of the pending queue,
+		// as per the setStatusState method, so insert it at the top of the pending list.
+		DownloadObject bottomPending = mPendingList.get(mPendingList.size() - 1);
+		mPendingList.add(0, bottomPending);
+		// Now there're two of the same, so remove the one left at the bottom.
+		mPendingList.remove(mPendingList.size() - 1);
 	}
 }

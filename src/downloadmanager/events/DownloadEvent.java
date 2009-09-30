@@ -26,5 +26,4 @@ public abstract class DownloadEvent {
 	public DownloadObject getDownloadObject() {
 		return mDownloadObject;
 	}
-
 }

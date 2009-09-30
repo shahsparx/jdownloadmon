@@ -7,6 +7,7 @@ import downloadmanager.states.InactiveState;
 import downloadmanager.events.DownloadStatusStateEvent;
 import downloadmanager.events.DownloadProgressEvent;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 /**
  * A download object represents anything that is being downloaded.
@@ -50,23 +51,26 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 * @see Runnable#run()
 	 */
 	public void run() {
+		DownloadConnection runConnection = null;
 		try {
+			runConnection = mDownloadConnection.getDeepCopy();
 			mDownloadFile = new DownloadFile(mDestination, mDownloadedSize);
-			mSize = mDownloadConnection.connect(mDownloadedSize);
+			mSize = runConnection.connect(mDownloadedSize);
 			// if file is completed, set state to completed by notifying download manager of the size
 			// download manager will set state and the while loop will be skipped.
 			notifyListeners(new DownloadProgressEvent(this));
 			while (mStatusState instanceof ActiveState) {
-				byte[] bytes = mDownloadConnection.getBytes(mDownloadedSize, mSize, BUFFER_SIZE);
+				byte[] bytes = runConnection.getBytes(mDownloadedSize, mSize, BUFFER_SIZE);
 				mDownloadFile.write(bytes);
 				mDownloadedSize += bytes.length;
 				notifyListeners(new DownloadProgressEvent(this));
 			}
 		} catch (Exception ex) {
 			setStatusState(new ErrorState(this, ex.toString()));
+			DownloadLogger.LOGGER.log(Level.WARNING, ex.toString());
 		} finally {
 			mDownloadFile.close();
-			mDownloadConnection.close();
+			runConnection.close();
 		}
 	}
 
@@ -92,9 +96,9 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 */
 	public void setStatusState(StatusState state) {
 		if (mStatusState.changeTo(state)) {
-			DownloadStatusStateEvent event = new DownloadStatusStateEvent(state);
-			notifyListeners(event);
 			mStatusState = state;
+			DownloadStatusStateEvent event = new DownloadStatusStateEvent(this);
+			notifyListeners(event);
 		}
 	}
 
@@ -135,10 +139,10 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	}
 
 	/**
-	 * Try to stop this download from downloading.
+	 * Try to pause this download object's download.
 	 */
-	public void stop() {
-		mStatusState.stop();
+	public void pause() {
+		mStatusState.pause();
 	}
 
 	/**
@@ -152,7 +156,14 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 * Remove this download.
 	 */
 	public void remove() {
-		stop();
+		pause();
 		mStatusState.remove();
+	}
+
+	/**
+	 * @return The queue position of this download.
+	 */
+	public String getQueuePosition() {
+		return mStatusState.getQueuePosition();
 	}
 }

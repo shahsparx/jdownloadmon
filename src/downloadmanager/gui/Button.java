@@ -11,22 +11,22 @@ import javax.swing.JButton;
  */
 public abstract class Button implements ActionListener {
 
-    /** The JButton wrapped in this button. */
-    protected JButton mButton;
+	/** The JButton wrapped in this button. */
+	protected JButton mButton;
 
-    /**
-     * Construct a button.
-     * @param button The JButton used in this button.
-     */
-    protected Button(JButton button) {
-	mButton = button;
+	/**
+	 * Construct a button.
+	 * @param button The JButton used in this button.
+	 */
+	protected Button(JButton button) {
+		mButton = button;
 		mButton.addActionListener(this);
-    }
+	}
 
-    /**
-     * Performs a specific action in the download manager, depending on what button this is.
-     */
-    public abstract void push();
+	/**
+	 * Performs a specific action in the download manager, depending on what button this is.
+	 */
+	public abstract void push();
 
 	public void actionPerformed(ActionEvent ae) {
 		push();

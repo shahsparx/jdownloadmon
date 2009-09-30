@@ -3,6 +3,7 @@ package downloadmanager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -28,7 +29,7 @@ public class HTTPDownloadConnection extends DownloadConnection {
 	public byte[] getBytes(long downloaded, long totalSize, int bufferSize) throws java.io.IOException, InterruptedException {
 		byte[] buffer;
 		int readSize;
-		
+
 		if (totalSize - downloaded > bufferSize) {
 			readSize = bufferSize;
 		} else {
@@ -39,7 +40,7 @@ public class HTTPDownloadConnection extends DownloadConnection {
 		while (mStream.available() < readSize) {
 			Thread.sleep(10); // sleep if not yet ready
 		}
-		
+
 		// read
 		buffer = new byte[readSize];
 		int read = mStream.read(buffer);
@@ -63,11 +64,11 @@ public class HTTPDownloadConnection extends DownloadConnection {
 
 	@Override
 	public int connect(long downloaded) throws IOException {
-			mConnection = (HttpURLConnection) mURL.openConnection();
-			mConnection.connect();
-			mStream = mConnection.getInputStream();
-			mStream.skip(downloaded);
-			return mConnection.getContentLength();
+		mConnection = (HttpURLConnection) mURL.openConnection();
+		mConnection.connect();
+		mStream = mConnection.getInputStream();
+		//mStream.skip(downloaded);
+		return mConnection.getContentLength();
 	}
 
 	@Override
@@ -80,5 +81,11 @@ public class HTTPDownloadConnection extends DownloadConnection {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public DownloadConnection getDeepCopy() throws MalformedURLException {
+		URL url = new URL(mURL.toString());
+		return new HTTPDownloadConnection(url);
 	}
 }

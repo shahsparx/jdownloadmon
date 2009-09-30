@@ -11,17 +11,14 @@ public class DownloadStatusStateEvent extends DownloadEvent {
 
 	/** The status state the download object was at at the time of this event's creation. */
 	private StatusState mStatusState;
-	/** The status state the download is changing to. */
-	private StatusState mNewStatusState;
 
 	/**
 	 * Construct a download status state event.
-	 * @param newStatusState The new status state the download object wants to change to.
+	 * @param downloadObject The download object this event is associated with.
 	 */
-	public DownloadStatusStateEvent(StatusState newStatusState) {
-		super(newStatusState.getDownloadObject());
-		mStatusState = mDownloadObject.getStatusState();
-		mNewStatusState = newStatusState;
+	public DownloadStatusStateEvent(DownloadObject downloadObject) {
+		super(downloadObject);
+		mStatusState = downloadObject.getStatusState().getShallowCopy();
 	}
 
 	/**
@@ -31,12 +28,4 @@ public class DownloadStatusStateEvent extends DownloadEvent {
 	public StatusState getStatusState() {
 		return mStatusState;
 	}
-
-	/**
-	 * @return the state the download is changing to.
-	 */
-	public StatusState getNewStatusState() {
-		return mNewStatusState;
-	}
-
 }

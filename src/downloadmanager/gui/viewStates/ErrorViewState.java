@@ -1,7 +1,7 @@
 package downloadmanager.gui.viewStates;
 
 /**
- *
+ * Class for displaying an error status state.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class ErrorViewState extends ViewState {

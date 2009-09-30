@@ -1,7 +1,7 @@
 package downloadmanager.gui.viewStates;
 
 /**
- *
+ * Class for displaying a completed status state.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class CompletedViewState extends ViewState {
@@ -10,5 +10,4 @@ public class CompletedViewState extends ViewState {
 	public String toString() {
 		return "completed";
 	}
-
 }

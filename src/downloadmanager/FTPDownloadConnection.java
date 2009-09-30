@@ -36,4 +36,9 @@ public class FTPDownloadConnection extends DownloadConnection {
 	public int connect(long downloadedSize) throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	@Override
+	public DownloadConnection getDeepCopy() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

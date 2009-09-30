@@ -3,19 +3,17 @@ package downloadmanager.gui.viewStates;
 import downloadmanager.gui.*;
 import javax.swing.ImageIcon;
 
-
 /**
- *
+ * A view state is used to display a downloadObject's status state.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public abstract class ViewState {
 
 	/**
-	 * Get an image...
-	 * @return The image
+	 * Get the icon that represents this view state.
+	 * @return The ImageIcon that represents this view state.
 	 */
-	//TODO make this (or preferrably outside class) a store with each image stored only once in a hashmap.
-	public ImageIcon getImageIcon() {		
+	public ImageIcon getImageIcon() {
 		return IconStore.INSTANCE.getImageIcon(getFilename());
 	}
 
@@ -36,7 +34,4 @@ public abstract class ViewState {
 	public String getToolTipText() {
 		return toString();
 	}
-
-	//TODO inside DownloadObjects run method is a check to see if download is completed and then run changeState which notifies listeners.
-	//TODO Use if else if for now to determine which viewstate to use with which statustate on downloadStateevent.
 }
