@@ -5,28 +5,17 @@ import downloadmanager.events.DownloadProgressEvent;
 import downloadmanager.DownloadObject;
 import downloadmanager.DownloadObserver;
 import downloadmanager.events.DownloadStatusStateEvent;
-import downloadmanager.gui.viewStates.ViewStateRenderer;
+import downloadmanager.gui.renderers.ViewStateRenderer;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Insets;
 import java.util.ArrayList;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JToolBar.Separator;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 
 /**
  * The GUI for the Download Manager.
@@ -49,7 +38,7 @@ public class GUI implements DownloadObserver {
 	private JButton mMoveUpQueueButton;
 	/** The button used to move selected downloads down the list. */
 	private JButton mMoveDownQueueButton;
-
+	/** All the buttons. */
 	private ArrayList<JButton> mButtons;
 
 	/**
@@ -99,7 +88,7 @@ public class GUI implements DownloadObserver {
 		mButtons = new ArrayList<JButton>();
 		mButtons.add(mStartButton = new JButton(IconStore.INSTANCE.getImageIcon("start.png")));
 		mButtons.add(mStopButton = new JButton(IconStore.INSTANCE.getImageIcon("stop.png")));
-		mButtons.add(mRemoveButton =  new JButton(IconStore.INSTANCE.getImageIcon("remove.png")));
+		mButtons.add(mRemoveButton = new JButton(IconStore.INSTANCE.getImageIcon("remove.png")));
 		mButtons.add(mMoveUpQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("up.png")));
 		mButtons.add(mMoveDownQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("down.png")));
 
@@ -112,7 +101,7 @@ public class GUI implements DownloadObserver {
 	private void setupGUI() {
 		for (JButton b : mButtons) {
 			String[] split = b.toString().split("/");
-			split = split[split.length-1].split(",");
+			split = split[split.length - 1].split(",");
 			split = split[0].split(".png");
 			String name = split[0];
 			b.setToolTipText(name);
@@ -129,13 +118,11 @@ public class GUI implements DownloadObserver {
 		topButtonsPanel.add(mStopButton);
 		topButtonsPanel.add(mRemoveButton);
 
-		JPanel bottomPanel = new JPanel();
+
 		JPanel bottomButtonsPanel = new JPanel();
 		bottomButtonsPanel.setLayout(new FlowLayout());
 		bottomButtonsPanel.add(mMoveUpQueueButton);
 		bottomButtonsPanel.add(mMoveDownQueueButton);
-		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-		bottomPanel.add(bottomButtonsPanel);
 
 		JPanel middlePanel = new JPanel();
 		JScrollPane pane = new JScrollPane(mQueue);
@@ -143,15 +130,14 @@ public class GUI implements DownloadObserver {
 
 		JFrame frame = new JFrame("jDownloadMon");
 		Container content = frame.getContentPane();
-		
+
 		content.add(topButtonsPanel, BorderLayout.NORTH);
 		content.add(middlePanel, BorderLayout.CENTER);
-		content.add(bottomPanel, BorderLayout.SOUTH);
+		content.add(bottomButtonsPanel, BorderLayout.SOUTH);
 
 		JMenuBar bar = new JMenuBar();
 		JMenu menu = new JMenu("Options");
-		JMenuItem item = new JMenuItem("D");
-		menu.add(item);
+
 		bar.add(menu);
 		frame.setJMenuBar(bar);
 
@@ -167,7 +153,8 @@ public class GUI implements DownloadObserver {
 	 */
 	public void addDownloadObject(DownloadObject downloadObject) {
 		downloadObject.addListener(this);
-		DownloadView downloadView = new DownloadView(downloadObject, new ViewStateRenderer(new InactiveViewState()));
+		DownloadView downloadView = new DownloadView(downloadObject,
+				new ViewStateRenderer(new InactiveViewState()));
 		mQueue.addDownloadView(downloadView);
 	}
 
@@ -191,6 +178,7 @@ public class GUI implements DownloadObserver {
 	public JButton getRemoveButton() {
 		return mRemoveButton;
 	}
+
 	/**
 	 * @return The move up queue button.
 	 */

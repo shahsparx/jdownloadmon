@@ -45,7 +45,17 @@ public class ErrorState extends StatusState {
 	}
 
 	@Override
-	public void stop() {
+	public void pause() {
 		//do nothing, not active
+	}
+
+	@Override
+	public String getQueuePosition() {
+		return "";
+	}
+
+	@Override
+	public StatusState getShallowCopy() {
+		return new ErrorState(null, mErrorMessage);
 	}
 }

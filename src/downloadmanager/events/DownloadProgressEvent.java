@@ -7,7 +7,7 @@ import downloadmanager.*;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class DownloadProgressEvent extends DownloadEvent {
-	
+
 	/** The percent (0-100) downloaded. */
 	private int mPercentDownloaded;
 

@@ -1,6 +1,7 @@
 package downloadmanager;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -19,7 +20,7 @@ public abstract class DownloadConnection {
 	protected DownloadConnection(URL url) {
 		mURL = url;
 	}
-	
+
 	/**
 	 * Get a file's filename from this connection's url.
 	 * @return The file's filename as a String.
@@ -67,4 +68,10 @@ public abstract class DownloadConnection {
 	 * Close the connection and any associated streams.
 	 */
 	public abstract void close();
+
+	/**
+	 * @return a copy of this download connection.
+	 * @throws MalformedURLException if the URL contained in this URL was errenous.
+	 */
+	public abstract DownloadConnection getDeepCopy() throws MalformedURLException;
 }

@@ -7,6 +7,7 @@ import downloadmanager.*;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class ActiveState extends StatusState {
+
 	/**
 	 * Construct an active state.
 	 * @param downloadObject The downloadObject associated with this state.
@@ -39,7 +40,17 @@ public class ActiveState extends StatusState {
 	}
 
 	@Override
-	public void stop() {
+	public void pause() {
 		mDownloadObject.setStatusState(new InactiveState(mDownloadObject));
+	}
+
+	@Override
+	public String getQueuePosition() {
+		return DownloadManager.INSTANCE.getActiveQueuePosition(mDownloadObject);
+	}
+
+	@Override
+	public StatusState getShallowCopy() {
+		return new ActiveState(null);
 	}
 }

@@ -1,10 +1,7 @@
 package downloadmanager.gui.viewStates;
 
-import java.awt.Component;
-import javax.swing.JTable;
-
 /**
- *
+ * Class for displaying an inactive status state.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class InactiveViewState extends ViewState {

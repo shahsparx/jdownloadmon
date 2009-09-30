@@ -1,36 +1,40 @@
 package downloadmanager.gui;
 
+import downloadmanager.gui.renderers.PositionRenderer;
 import downloadmanager.gui.viewStates.ViewState;
 import downloadmanager.DownloadObject;
-import downloadmanager.gui.viewStates.ViewStateRenderer;
-import java.awt.Component;
-import javax.swing.JProgressBar;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
+import downloadmanager.gui.renderers.FilenameRenderer;
+import downloadmanager.gui.renderers.ProgressBarRenderer;
+import downloadmanager.gui.renderers.ViewStateRenderer;
 
 /**
  * A download component is a viewable download object.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class DownloadView implements TableCellRenderer {
+public class DownloadView {
 
 	/** The download object wrapped in this download view. */
 	private DownloadObject mDownloadObject;
-	/** The progress bar for this download component. */
-	private JProgressBar mProgressBar;
-	/** The Viewstate of this download view. */
+	/** The view state renderer of this download view. */
 	private ViewStateRenderer mViewStateRenderer;
+	/** The progress bar renderer of this download view. */
+	private ProgressBarRenderer mProgressBarRenderer;
+	/** The position renderer of this download view. */
+	private PositionRenderer mPositionRenderer;
+	/** The filename renderer of this download view. */
+	private FilenameRenderer mFilenameRenderer;
 
 	/**
 	 * Construct a download component.
 	 * @param downloadObject The download object to be viewed.
 	 * @param viewStateRenderer The renderer used to render the view state.
 	 */
-	public DownloadView (DownloadObject downloadObject, ViewStateRenderer viewStateRenderer) {
-		mDownloadObject =  downloadObject;
+	public DownloadView(DownloadObject downloadObject, ViewStateRenderer viewStateRenderer) {
+		mDownloadObject = downloadObject;
 		mViewStateRenderer = viewStateRenderer;
-		mProgressBar = new JProgressBar(0, 100);
-		mProgressBar.setStringPainted(true);
+		mProgressBarRenderer = new ProgressBarRenderer();
+		mFilenameRenderer = new FilenameRenderer(getFileName());
+		mPositionRenderer = new PositionRenderer(getQueuePosition());
 	}
 
 	/**
@@ -38,7 +42,31 @@ public class DownloadView implements TableCellRenderer {
 	 * @param percentage The percentage to set it to.
 	 */
 	public void setProgressBarValue(int percentage) {
-		mProgressBar.setValue(percentage);
+		mProgressBarRenderer.setProgressBarValue(percentage);
+	}
+
+	/**
+	 * Get the progress bar renderer
+	 * @return The progress bar renderer wrapped in this download view.
+	 */
+	public ProgressBarRenderer getProgressBarRenderer() {
+		return mProgressBarRenderer;
+	}
+
+	/**
+	 * Get the filename renderer.
+	 * @return The filename renderer wrapped in this download view.
+	 */
+	public FilenameRenderer getFilenameRenderer() {
+		return mFilenameRenderer;
+	}
+
+	/**
+	 * Get the position renderer.
+	 * @return The position renderer wrapped in this download view.
+	 */
+	public PositionRenderer getPositionRenderer() {
+		return mPositionRenderer;
 	}
 
 	/**
@@ -47,12 +75,7 @@ public class DownloadView implements TableCellRenderer {
 	 */
 	public String getFileName() {
 		String[] path = mDownloadObject.getDestination().split("/");
-		return path[path.length-1];
-	}
-
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		DownloadView v = (DownloadView) value;
-		return v.mProgressBar;
+		return path[path.length - 1];
 	}
 
 	/**
@@ -79,7 +102,31 @@ public class DownloadView implements TableCellRenderer {
 		return mDownloadObject;
 	}
 
-	void remove() {
+	/**
+	 * @return The queue position of this download or an empty string if the download is not active or pending.
+	 */
+	public String getQueuePosition() {
+		return mDownloadObject.getQueuePosition();
+	}
+
+	/**
+	 * Remove the download object.
+	 */
+	public void remove() {
 		mDownloadObject = null;
+	}
+
+	/**
+	 * Update this download view's queue position.
+	 */
+	public void updateQueuePosition() {
+		mPositionRenderer.setQueuePosition(getQueuePosition());
+	}
+
+	/**
+	 * Update this download view's filename.
+	 */
+	public void updateFileName() {
+		mFilenameRenderer.setFilename(getFileName());
 	}
 }

@@ -20,6 +20,11 @@ public abstract class StatusState {
 	}
 
 	/**
+	 * @return a shallow copy of this status state.
+	 */
+	public abstract StatusState getShallowCopy();
+
+	/**
 	 * @return The download object wrapped in this statusState.
 	 */
 	public DownloadObject getDownloadObject() {
@@ -32,9 +37,9 @@ public abstract class StatusState {
 	public abstract void download();
 
 	/**
-	 * Try to stop downloading.
+	 * Try to pause downloading.
 	 */
-	public abstract void stop();
+	public abstract void pause();
 
 	/**
 	 * Change a download object's state from this status state to another.
@@ -46,7 +51,7 @@ public abstract class StatusState {
 			mDownloadObject.getStatusState().changeFrom();
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -67,4 +72,9 @@ public abstract class StatusState {
 	public void remove() {
 		changeFrom();
 	}
+
+	/**
+	 * @return The download object's queue position, or an empty String if the download is not queuing.
+	 */
+	public abstract String getQueuePosition();
 }

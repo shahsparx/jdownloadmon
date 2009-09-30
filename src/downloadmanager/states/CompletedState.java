@@ -33,7 +33,17 @@ public class CompletedState extends StatusState {
 	}
 
 	@Override
-	public void stop() {
+	public void pause() {
 		//do nothing
+	}
+
+	@Override
+	public String getQueuePosition() {
+		return "";
+	}
+
+	@Override
+	public StatusState getShallowCopy() {
+		return new CompletedState(null);
 	}
 }

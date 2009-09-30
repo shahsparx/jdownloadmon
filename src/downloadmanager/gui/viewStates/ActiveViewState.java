@@ -1,7 +1,7 @@
 package downloadmanager.gui.viewStates;
 
 /**
- *
+ * Class for displaying an active status state.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class ActiveViewState extends ViewState {
@@ -10,5 +10,4 @@ public class ActiveViewState extends ViewState {
 	public String toString() {
 		return "active";
 	}
-
 }

@@ -9,19 +9,19 @@ import javax.swing.ImageIcon;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class IconStore {
-	
+
 	/** The singleton instance of this store. */
 	public static final IconStore INSTANCE = new IconStore();
 	/** The hash map containing the icons. */
 	private HashMap<String, ImageIcon> mIcons;
-	
+
 	/**
 	 * Private constructor.
 	 */
 	private IconStore() {
 		mIcons = new HashMap<String, ImageIcon>();
 	}
-	
+
 	/**
 	 * Get an icon from the store.
 	 * @param ref The path to the icon.
@@ -37,7 +37,7 @@ public class IconStore {
 		URL url = getClass().getResource(ref);
 		ImageIcon icon = new ImageIcon(url);
 		mIcons.put(ref, icon);
-		
+
 		return icon;
 	}
 }

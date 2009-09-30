@@ -14,19 +14,19 @@ import javax.swing.JTextField;
  */
 public class NewDownloadButton extends Button {
 
-    /**
-     * Construct a new download button.
+	/**
+	 * Construct a new download button.
 	 * @param button The JButton wrapped in this button.
 	 * @see Button#Button(javax.swing.JButton, downloadmanager.DownloadManager)
-     */
-    public NewDownloadButton(JButton button) {
-        super(button);
+	 */
+	public NewDownloadButton(JButton button) {
+		super(button);
 		button.setToolTipText("new");
 		button.setFocusPainted(false);
-    }
+	}
 
-    @Override
-    public void push() {
+	@Override
+	public void push() {
 		JFrame frame = new JFrame("New Download");
 		Container content = frame.getContentPane();
 		JPanel center = new JPanel();
@@ -39,8 +39,8 @@ public class NewDownloadButton extends Button {
 		frame.setLocation(220, 300);
 		frame.pack();
 		frame.setVisible(true);
-		
-        AddDownloadBox box = new AddDownloadBox(urlField);
+
+		AddDownloadBox box = new AddDownloadBox(urlField);
 		new AddDownloadButton(addButton, box, frame);
-    }
+	}
 }

@@ -21,6 +21,7 @@ public class AddDownloadBox {
 	public AddDownloadBox(JTextField field) {
 		mURLTextField = field;
 		mURLTextField.setText("http://googleisagiantrobot.com/google-is-a-giant-robot.png");
+		mURLTextField.setToolTipText("URL Textfield");
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem item = new JMenuItem(new DefaultEditorKit.CutAction());
 		item.setText("Cut");

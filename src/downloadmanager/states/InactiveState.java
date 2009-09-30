@@ -13,7 +13,7 @@ public class InactiveState extends StatusState {
 	 * @param downloadObject The downloadObject associated with this state.
 	 */
 	public InactiveState(DownloadObject downloadObject) {
-        super(downloadObject);
+		super(downloadObject);
 	}
 
 	@Override
@@ -33,7 +33,17 @@ public class InactiveState extends StatusState {
 	}
 
 	@Override
-	public void stop() {
+	public void pause() {
 		//do nothing, already inactive
+	}
+
+	@Override
+	public String getQueuePosition() {
+		return "";
+	}
+
+	@Override
+	public StatusState getShallowCopy() {
+		return new InactiveState(null);
 	}
 }

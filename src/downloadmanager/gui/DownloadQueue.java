@@ -1,5 +1,6 @@
 package downloadmanager.gui;
 
+import downloadmanager.DownloadManager;
 import downloadmanager.gui.viewStates.CompletedViewState;
 import downloadmanager.gui.viewStates.ErrorViewState;
 import downloadmanager.gui.viewStates.ActiveViewState;
@@ -10,7 +11,11 @@ import downloadmanager.states.CompletedState;
 import downloadmanager.events.DownloadProgressEvent;
 import downloadmanager.DownloadObject;
 import downloadmanager.events.DownloadStatusStateEvent;
-import downloadmanager.gui.viewStates.ViewStateRenderer;
+import downloadmanager.gui.renderers.FilenameRenderer;
+import downloadmanager.gui.renderers.PositionRenderer;
+import downloadmanager.gui.renderers.ProgressBarRenderer;
+import downloadmanager.gui.renderers.ViewStateRenderer;
+import downloadmanager.gui.viewStates.ViewState;
 import downloadmanager.states.ErrorState;
 import downloadmanager.states.InactiveState;
 import downloadmanager.states.PendingState;
@@ -19,7 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableColumn;
 
 /**
  * A download queue for the gui to show the list of download objects.
@@ -33,19 +38,6 @@ public class DownloadQueue extends JTable implements ActionListener {
 	DownloadTableModel mTableModel;
 
 	/**
-	 * The columns in this table.
-	 */
-	private enum Columns {
-
-		/** Filename column. */
-		Filename,
-		/** Status state icon column. */
-		Status,
-		/** Progress bar column. */
-		Progress;
-	}
-
-	/**
 	 * Construct a download queue.
 	 * @param model The default table model to use with this table.
 	 */
@@ -53,10 +45,14 @@ public class DownloadQueue extends JTable implements ActionListener {
 		super(model);
 		mTableModel = model;
 		mDownloadViews = new HashMap<DownloadObject, DownloadView>();
-		mTableModel.setColumnIdentifiers(Columns.values());
 		//set the progress column so that a progressbar is renderable in it.
-		columnModel.getColumn(columnModel.getColumnIndex(Columns.Progress.toString())).setCellRenderer(new DownloadView(null, null));
-		columnModel.getColumn(columnModel.getColumnIndex(Columns.Status.toString())).setCellRenderer(new ViewStateRenderer(new InactiveViewState()));
+		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Progress.toString())).setCellRenderer(new ProgressBarRenderer());
+		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Status.toString())).setCellRenderer(new ViewStateRenderer(new InactiveViewState()));
+		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Filename.toString())).setCellRenderer(new FilenameRenderer(""));
+		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Position.toString()));
+		position.setCellRenderer(new PositionRenderer(""));
+		position.setHeaderValue("#");
+		position.setMaxWidth(20);
 	}
 
 	/**
@@ -67,6 +63,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		mDownloadViews.put(downloadView.getDownloadObject(), downloadView);
 		mTableModel.addDownloadView(downloadView);
 	}
+
 	/**
 	 * Remove a download view from the table.
 	 * @param downloadObject The download object linked to the download view to remove.
@@ -91,7 +88,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 	 */
 	public void update(DownloadStatusStateEvent downloadStatusStateEvent) {
 		DownloadView view = mDownloadViews.get(downloadStatusStateEvent.getDownloadObject());
-		StatusState statusState = downloadStatusStateEvent.getNewStatusState();
+		StatusState statusState = downloadStatusStateEvent.getStatusState();
 		if (statusState instanceof ActiveState) {
 			view.setViewState(new ActiveViewState());
 		} else if (statusState instanceof InactiveState) {
@@ -101,10 +98,24 @@ public class DownloadQueue extends JTable implements ActionListener {
 		} else if (statusState instanceof CompletedState) {
 			view.setViewState(new CompletedViewState());
 		} else if (statusState instanceof ErrorState) {
-			view.setViewState(new ErrorViewState(((ErrorState)statusState).getErrorMessage()));
+			view.setViewState(new ErrorViewState(((ErrorState) statusState).getErrorMessage()));
 		}
 
+		view.updateQueuePosition();
+		updateQueuePositions();
 		this.repaint();
+	}
+
+	/**
+	 * Update the queue position numbers of active and pending download views.
+	 */
+	public void updateQueuePositions() {
+		for (DownloadView view : mDownloadViews.values()) {
+			ViewState state = view.getViewStateRenderer().getViewState();
+			if (state instanceof ActiveViewState || state instanceof PendingViewState) {
+				view.updateQueuePosition();
+			}
+		}
 	}
 
 	/**
@@ -116,14 +127,18 @@ public class DownloadQueue extends JTable implements ActionListener {
 		return mDownloadViews.get(downloadObject);
 	}
 
+	/**
+	 * A button was pushed. Perform the appropriate action on selected rows.
+	 *
+	 * @param e The action event with info about which button was pushed, among others.
+	 */
 	public void actionPerformed(ActionEvent e) {
-		Object source = e.getSource();
 		DownloadView[] views = new DownloadView[getSelectedRows().length];
-
 		int i = 0;
-		int column = columnModel.getColumnIndex(Columns.Progress.toString());
+
+		Object source = e.getSource();
 		for (int row : getSelectedRows()) {
-			DownloadView view = (DownloadView) getValueAt(row, column);
+			DownloadView view = mTableModel.getViewAt(row);
 			views[i] = view;
 			i++;
 		}
@@ -134,25 +149,48 @@ public class DownloadQueue extends JTable implements ActionListener {
 			}
 		} else if (source.equals(GUI.INSTANCE.getStopButton())) {
 			for (DownloadView view : views) {
-				view.getDownloadObject().stop();
+				view.getDownloadObject().pause();
 			}
 		} else if (source.equals(GUI.INSTANCE.getRemoveButton())) {
 			while (getSelectedRowCount() > 0) {
 				int row = getSelectedRow();
-				DownloadView view = (DownloadView) getValueAt(row, column);
+				DownloadView view = mTableModel.getViewAt(row);
 				DownloadObject downloadObject = view.getDownloadObject();
 				downloadObject.remove();
 				removeDownloadView(downloadObject);
-				mTableModel.removeRow(row);
+				mTableModel.removeDownloadView(row);
 			}
 		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
 			for (DownloadView view : views) {
-				// TODO move stuff up
+
+				DownloadObject downloadObject = view.getDownloadObject();
+				if (downloadObject.getStatusState() instanceof ActiveState) {
+					DownloadManager.INSTANCE.moveActiveUp(downloadObject);
+				} else if (downloadObject.getStatusState() instanceof PendingState) {
+					DownloadManager.INSTANCE.movePendingUp(downloadObject);
+				}
 			}
+
+			/* if (getSelectedRow() != 0) {
+			for (int row : getSelectedRows()) {
+			mTableModel.moveRowUp(row);
+			}
+			for (int row : getSelectedRows()) {
+			this.removeRowSelectionInterval(row, row);
+			this.addRowSelectionInterval(row - 1, row - 1);
+			}
+			}*/
 		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {
 			for (DownloadView view : views) {
-				// TODO move stuff down
+				DownloadObject downloadObject = view.getDownloadObject();
+				if (downloadObject.getStatusState() instanceof ActiveState) {
+					DownloadManager.INSTANCE.moveActiveDown(downloadObject);
+				} else if (downloadObject.getStatusState() instanceof PendingState) {
+					DownloadManager.INSTANCE.movePendingDown(downloadObject);
+				}
 			}
 		}
+
+		updateQueuePositions();
 	}
 }

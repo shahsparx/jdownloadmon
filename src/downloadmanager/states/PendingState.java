@@ -33,7 +33,17 @@ public class PendingState extends StatusState {
 	}
 
 	@Override
-	public void stop() {
+	public void pause() {
 		mDownloadObject.setStatusState(new InactiveState(mDownloadObject));
+	}
+
+	@Override
+	public String getQueuePosition() {
+		return DownloadManager.INSTANCE.getPendingQueuePosition(mDownloadObject);
+	}
+
+	@Override
+	public StatusState getShallowCopy() {
+		return new PendingState(null);
 	}
 }
