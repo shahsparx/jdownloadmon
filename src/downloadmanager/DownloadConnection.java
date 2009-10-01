@@ -59,10 +59,10 @@ public abstract class DownloadConnection {
 	/**
 	 * Connect to the server.
 	 * @param downloadedSize How much is already downloaded.
-	 * @return The full size of the file that's to be downloaded.
+	 * @return The size of what's left to be downloaded.
 	 * @throws IOException if the connection was unsuccessful.
 	 */
-	public abstract int connect(long downloadedSize) throws IOException;
+	public abstract long connect(long downloadedSize) throws IOException;
 
 	/**
 	 * Close the connection and any associated streams.

@@ -141,7 +141,6 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	public DownloadObject addDownload(String URL) throws MalformedURLException {
 		URL verifiedURL = verifyUrl(URL);
-
 		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
 		mInactiveList.add(downloadObject);
 		downloadObject.addListener(this);
@@ -157,14 +156,13 @@ public class DownloadManager implements DownloadObserver {
 	private URL verifyUrl(String url) throws MalformedURLException {
 		// Only allow HTTP URLs.
 		if (!url.toLowerCase().startsWith("http://")) {
-			return null;
+			throw new MalformedURLException("Must start with http://");
 		}
-		// Verify format of URL.
-		URL verifiedUrl = null;
-		verifiedUrl = new URL(url);
+
+		URL verifiedUrl = new URL(url);
 		// Make sure URL specifies a file.
 		if (verifiedUrl.getFile().length() < 2) {
-			return null;
+			throw new MalformedURLException("URL has to specify a file.");
 		}
 		return verifiedUrl;
 	}
@@ -207,6 +205,13 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	public String getPendingQueuePosition(DownloadObject downloadObject) {
 		return Integer.toString(mActiveList.size() + mPendingList.indexOf(downloadObject) + 1);
+	}
+
+	/**
+	 * @return The number of active and pending downloads.
+	 */
+	public int getNumberOfQueuedDownloads() {
+		return mActiveList.size() + mPendingList.size();
 	}
 
 	/**
