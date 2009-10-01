@@ -21,9 +21,10 @@ public class DownloadTableModel extends DefaultTableModel {
 	private Vector<Vector<DownloadRenderer>> mRows;
 	/** Hashmap of the views and vectors linked to them. */
 	private HashMap<Vector<DownloadRenderer>, DownloadView> mViews;
-
-	protected int mSortColumn = 0;
-		protected boolean mIsSortAsc = true;
+	/** The sorting column which sorting is applied on. */
+	protected int mSortColumn = -1;
+	/** Boolean representing whether sorting is done ascending or descending. */
+	protected boolean mIsSortAsc = true;
 
 	/**
 	 * The columns in this table.
@@ -113,7 +114,9 @@ public class DownloadTableModel extends DefaultTableModel {
 	 * @param column Which column to sort by.
 	 */
 	public void sortRowsByColumn(int column) {
-		Collections.sort((Vector)mRows, new ColumnComparator<DownloadRenderer>(mIsSortAsc, column));
+		if (column > 0 && column < Columns.values().length) {
+			Collections.sort((Vector)mRows, new ColumnComparator<DownloadRenderer>(mIsSortAsc, column));
+		}
 	}
 
 	/**
@@ -172,7 +175,12 @@ public class DownloadTableModel extends DefaultTableModel {
 			int modelIndex = colModel.getColumn(columnModelIndex).getModelIndex();
 
 			if (mSortColumn == modelIndex) {
-				mIsSortAsc = !mIsSortAsc;
+				if (mIsSortAsc) {
+					mIsSortAsc = !mIsSortAsc;
+				} else {
+					mSortColumn = -1;
+					mIsSortAsc = true;
+				}
 			} else {
 				mSortColumn = modelIndex;
 			}
@@ -181,7 +189,7 @@ public class DownloadTableModel extends DefaultTableModel {
 				 col.setHeaderValue(getColumnName( col.getModelIndex()));
 			}
 			DownloadView[] views = mQueue.getSelectedViews();
-			sortRowsByColumn(modelIndex);
+			sortRowsByColumn(mSortColumn);
 			fireTableDataChanged();
 			mQueue.selectViews(views);
 		}

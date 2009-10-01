@@ -57,7 +57,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Progress.toString())).setCellRenderer(new ProgressBarRenderer());
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Status.toString())).setCellRenderer(new ViewStateRenderer(new InactiveViewState()));
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Filename.toString())).setCellRenderer(new FilenameRenderer(""));
-		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex("# +"));
+		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex("#"));
 		position.setCellRenderer(new PositionRenderer(""));
 		position.setMaxWidth(20);
 	}
