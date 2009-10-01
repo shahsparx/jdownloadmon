@@ -44,18 +44,19 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		mObservers = new ArrayList<DownloadObserver>();
 		mStatusState = new InactiveState(this);
 		mDestination = DEFAULT_DIRECTORY + mDownloadConnection.getFileName();
-		mDownloadedSize = DownloadFile.getFileLength(mDestination);
 	}
 
 	/**
 	 * @see Runnable#run()
 	 */
 	public void run() {
+		mDownloadedSize = DownloadFile.getFileLength(mDestination);
 		DownloadConnection runConnection = null;
 		try {
 			runConnection = mDownloadConnection.getDeepCopy();
 			mDownloadFile = new DownloadFile(mDestination, mDownloadedSize);
-			mSize = runConnection.connect(mDownloadedSize);
+			// since connect method returns whatever's left to download, that amount is added to downloaded size for total size.
+			mSize = runConnection.connect(mDownloadedSize) + mDownloadedSize;
 			// if file is completed, set state to completed by notifying download manager of the size
 			// download manager will set state and the while loop will be skipped.
 			notifyListeners(new DownloadProgressEvent(this));

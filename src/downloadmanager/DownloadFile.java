@@ -69,7 +69,7 @@ public class DownloadFile {
 			try {
 				mFile.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				//ignore
 			}
 		}
 	}

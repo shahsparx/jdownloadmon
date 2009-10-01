@@ -22,8 +22,10 @@ import downloadmanager.states.PendingState;
 import downloadmanager.states.StatusState;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.JTable;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
 /**
@@ -44,14 +46,19 @@ public class DownloadQueue extends JTable implements ActionListener {
 	public DownloadQueue(DownloadTableModel model) {
 		super(model);
 		mTableModel = model;
+
+		JTableHeader header = getTableHeader();
+		getTableHeader().addMouseListener(mTableModel.new ColumnListener(this));
+		header.setUpdateTableInRealTime(true);
+		header.setReorderingAllowed(true);
+
 		mDownloadViews = new HashMap<DownloadObject, DownloadView>();
 		//set the progress column so that a progressbar is renderable in it.
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Progress.toString())).setCellRenderer(new ProgressBarRenderer());
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Status.toString())).setCellRenderer(new ViewStateRenderer(new InactiveViewState()));
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Filename.toString())).setCellRenderer(new FilenameRenderer(""));
-		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Position.toString()));
+		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex("# +"));
 		position.setCellRenderer(new PositionRenderer(""));
-		position.setHeaderValue("#");
 		position.setMaxWidth(20);
 	}
 
@@ -116,6 +123,37 @@ public class DownloadQueue extends JTable implements ActionListener {
 				view.updateQueuePosition();
 			}
 		}
+
+		DownloadView[] views = getSelectedViews();
+		mTableModel.sortRows();
+		mTableModel.fireTableDataChanged();
+		selectViews(views);
+	}
+
+	/**
+	 * Get the download views that are selected;
+	 * @return An array of the download views that are currently selected.
+	 */
+	public DownloadView[] getSelectedViews() {
+		DownloadView[] views = new DownloadView[getSelectedRows().length];
+		int i = 0;
+		for (int row : getSelectedRows()) {
+			DownloadView view = mTableModel.getViewAt(row);
+			views[i] = view;
+			i++;
+		}
+		return views;
+	}
+
+	/**
+	 * Select the download views supplied.
+	 * @param views Which views to select.
+	 */
+	public void selectViews(DownloadView[] views) {
+		for (DownloadView view:  views) {
+			int row = mTableModel.getRowForView(view);
+			this.addRowSelectionInterval(row, row);
+		}
 	}
 
 	/**
@@ -133,16 +171,8 @@ public class DownloadQueue extends JTable implements ActionListener {
 	 * @param e The action event with info about which button was pushed, among others.
 	 */
 	public void actionPerformed(ActionEvent e) {
-		DownloadView[] views = new DownloadView[getSelectedRows().length];
-		int i = 0;
-
+		DownloadView[] views = getSelectedViews();
 		Object source = e.getSource();
-		for (int row : getSelectedRows()) {
-			DownloadView view = mTableModel.getViewAt(row);
-			views[i] = view;
-			i++;
-		}
-
 		if (source.equals(GUI.INSTANCE.getStartButton())) {
 			for (DownloadView view : views) {
 				view.getDownloadObject().download();
@@ -160,37 +190,47 @@ public class DownloadQueue extends JTable implements ActionListener {
 				removeDownloadView(downloadObject);
 				mTableModel.removeDownloadView(row);
 			}
+		/*
+		 * The following two loops for moving downloads up and down the queue make sure that
+		 * when multiple downloads are selected they move in sync. For example:
+		 * If 1, 2 and 3 are selected and the user tries to move them up the queue nothing happens.
+		 */
 		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
+			int previousPos = 0;
+			Arrays.sort(views, new QueueComparator<DownloadView>());			
 			for (DownloadView view : views) {
-
-				DownloadObject downloadObject = view.getDownloadObject();
-				if (downloadObject.getStatusState() instanceof ActiveState) {
-					DownloadManager.INSTANCE.moveActiveUp(downloadObject);
-				} else if (downloadObject.getStatusState() instanceof PendingState) {
-					DownloadManager.INSTANCE.movePendingUp(downloadObject);
+				if (!view.getQueuePosition().equals("")) {
+					previousPos++;
+					int pos = Integer.parseInt(view.getQueuePosition());
+					if (pos != previousPos) {
+						DownloadObject downloadObject = view.getDownloadObject();
+						if (downloadObject.getStatusState() instanceof ActiveState) {
+							DownloadManager.INSTANCE.moveActiveUp(downloadObject);
+						} else if (downloadObject.getStatusState() instanceof PendingState) {
+							DownloadManager.INSTANCE.movePendingUp(downloadObject);
+						}
+					}
 				}
 			}
-
-			/* if (getSelectedRow() != 0) {
-			for (int row : getSelectedRows()) {
-			mTableModel.moveRowUp(row);
-			}
-			for (int row : getSelectedRows()) {
-			this.removeRowSelectionInterval(row, row);
-			this.addRowSelectionInterval(row - 1, row - 1);
-			}
-			}*/
 		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {
-			for (DownloadView view : views) {
-				DownloadObject downloadObject = view.getDownloadObject();
-				if (downloadObject.getStatusState() instanceof ActiveState) {
-					DownloadManager.INSTANCE.moveActiveDown(downloadObject);
-				} else if (downloadObject.getStatusState() instanceof PendingState) {
-					DownloadManager.INSTANCE.movePendingDown(downloadObject);
+			Arrays.sort(views, new QueueComparator<DownloadView>());
+			int previousPos = DownloadManager.INSTANCE.getNumberOfQueuedDownloads()+1;
+			for (int i = views.length-1; i >= 0; i--) {
+				DownloadView view = views[i];
+				if (!view.getQueuePosition().equals("")) {
+					previousPos--;
+					int pos = Integer.parseInt(view.getQueuePosition());
+					if (pos != previousPos) {
+						DownloadObject downloadObject = view.getDownloadObject();
+						if (downloadObject.getStatusState() instanceof ActiveState) {
+							DownloadManager.INSTANCE.moveActiveDown(downloadObject);
+						} else if (downloadObject.getStatusState() instanceof PendingState) {
+							DownloadManager.INSTANCE.movePendingDown(downloadObject);
+						}
+					}
 				}
 			}
 		}
-
 		updateQueuePositions();
 	}
 }

@@ -1,10 +1,15 @@
 package downloadmanager;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 /**
  * The HTTP download connection handles connections to HTTP servers.
@@ -13,9 +18,9 @@ import java.net.URL;
 public class HTTPDownloadConnection extends DownloadConnection {
 
 	/** The input stream used to read bytes from the server. */
-	InputStream mStream;
+	BufferedInputStream mStream;
 	/** The actual HTTP connection. */
-	HttpURLConnection mConnection;
+	HttpMethod mRequest;
 
 	/**
 	 * Construct a HTTP Download Connection.
@@ -63,23 +68,39 @@ public class HTTPDownloadConnection extends DownloadConnection {
 	}
 
 	@Override
-	public int connect(long downloaded) throws IOException {
-		mConnection = (HttpURLConnection) mURL.openConnection();
-		mConnection.connect();
-		mStream = mConnection.getInputStream();
-		//mStream.skip(downloaded);
-		return mConnection.getContentLength();
+	public long connect(long downloaded) throws IOException {
+		HttpClient client = new HttpClient();
+		mRequest = new GetMethod(mURL.toString());
+		if (downloaded > 0L) {
+			// server must support partial content for resume
+			mRequest.addRequestHeader("Range", "bytes=" + downloaded + "-");
+			if (client.executeMethod(mRequest) != HttpStatus.SC_PARTIAL_CONTENT) {
+				throw new IOException("Server doesn't support partial content, or local file size >= remote file size");
+			}
+		} else if (client.executeMethod(mRequest) != HttpStatus.SC_OK) {
+			// response not ok
+			throw new IOException("Cannot retrieve file from server.");
+		}
+		Header contentLengthHeader = mRequest.getResponseHeader("content-length");
+		if (contentLengthHeader == null) {
+			throw new IOException("Cannot retrieve file from server.");
+		}
+
+		mStream = new BufferedInputStream(mRequest.getResponseBodyAsStream());
+		return Long.parseLong(contentLengthHeader.getValue());
 	}
 
 	@Override
 	public void close() {
-		if (mStream != null) {
-			try {
+		try {
+			if (mStream != null) {
 				mStream.close();
-				mConnection.disconnect();
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			if (mRequest != null) {
+				mRequest.releaseConnection();
+			}
+		} catch (Exception e) {
+			//ignore
 		}
 	}
 
