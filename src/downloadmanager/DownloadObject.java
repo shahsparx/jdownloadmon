@@ -18,8 +18,6 @@ public class DownloadObject implements Runnable, DownloadObservable {
 
 	/** Buffer size. */
 	private static final int BUFFER_SIZE = 1024;
-	/** Default directory location */
-	private static final String DEFAULT_DIRECTORY = "C:/downloads/";
 	/** List of progress observers observing this download object. */
 	private ArrayList<DownloadObserver> mObservers;
 	/** The download file's destionation. */
@@ -43,10 +41,23 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		mDownloadConnection = connection;
 		mObservers = new ArrayList<DownloadObserver>();
 		mStatusState = new InactiveState(this);
-		mDestination = DEFAULT_DIRECTORY + mDownloadConnection.getFileName();
 	}
 
 	/**
+	 * Set the directory.
+	 * @param directory The directory to set to.
+	 * @throws IllegalStateException if the download object is currently downloading.
+	 */
+	public void setDirectory(String directory) throws IllegalStateException {
+		if (mStatusState instanceof ActiveState) {
+			throw new IllegalStateException("Cannot change destination whilst downloading.");
+		}
+
+		mDestination = directory + mDownloadConnection.getFileName();
+	}
+
+	/**
+	 * Try to connect to server and gradually retrieve the file.
 	 * @see Runnable#run()
 	 */
 	public void run() {

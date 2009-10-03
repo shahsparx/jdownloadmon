@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package downloadmanager.gui;
 
 import downloadmanager.gui.renderers.DownloadRenderer;
@@ -10,9 +6,10 @@ import java.util.Vector;
 
 /**
  * A column comparator used for sorting rows on different columns.
+ * @param <T> The type.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class ColumnComparator<T> implements Comparator<T> {
+public class ColumnComparator<T extends Vector<DownloadRenderer>> implements Comparator<T> {
 
 	/** Whether or not to sort in ascending mode. */
 	protected boolean mIsSortAsc;
@@ -22,6 +19,7 @@ public class ColumnComparator<T> implements Comparator<T> {
 	/**
 	 * Construct a column comparator.
 	 * @param sortAsc If this comparator uses ascending sort method.
+	 * @param column Which column to sort on.
 	 */
 	public ColumnComparator(boolean sortAsc, int column) {
 		mIsSortAsc = sortAsc;
@@ -29,17 +27,14 @@ public class ColumnComparator<T> implements Comparator<T> {
 	}
 
 	/**
-	 * Compare to objects, in this case cells of a JTable.
+	 * Compare two objects, in this case cells of a JTable.
 	 * @param o1 The first object to compare.
 	 * @param o2 The second object to compare.
 	 * @return A negative integer, 0 or a positive integer depending on whehter o1 is less, equal to or greater than o2.
 	 */
-	public int compare(Object o1, Object o2) {
-		Vector<DownloadRenderer> firstVector = (Vector<DownloadRenderer>) o1;
-		Vector<DownloadRenderer> secondVector = (Vector<DownloadRenderer>) o2;
-
-		DownloadRenderer firstRenderer = firstVector.get(mColumnIndex);
-		DownloadRenderer secondRenderer = secondVector.get(mColumnIndex);
+	public int compare(T o1, T o2) {
+		DownloadRenderer firstRenderer = o1.get(mColumnIndex);
+		DownloadRenderer secondRenderer = o2.get(mColumnIndex);
 
 		String first = firstRenderer.toString();
 		String second = secondRenderer.toString();

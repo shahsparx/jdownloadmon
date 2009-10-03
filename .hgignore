@@ -2,7 +2,6 @@
 syntax: glob
 
 *.class
-*.jar
 build/*
 private/*
 dist/*

@@ -3,8 +3,11 @@ package downloadmanager.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -27,20 +30,37 @@ public class NewDownloadButton extends Button {
 
 	@Override
 	public void push() {
+		JPanel url = new JPanel(new GridLayout(2,2));
+		JPanel directory = new JPanel(new GridLayout(2,2));
+		JPanel buttons = new JPanel(new FlowLayout());
+
+		JTextField urlField = new JTextField(20);
+		JLabel urlLabel = new JLabel("URL:");
+		url.add(urlLabel);
+		url.add(urlField);
+
+		JTextField directoryField = new JTextField(20);
+		JLabel directoryLabel = new JLabel("Directory:");
+		directory.add(directoryLabel);
+		directory.add(directoryField);
+		
+		JButton addButton = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
+		buttons.add(addButton);
+
+		JPanel center = new JPanel();
+		center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+		
+		center.add(url);
+		center.add(directory);
+		center.add(buttons);
 		JFrame frame = new JFrame("New Download");
 		Container content = frame.getContentPane();
-		JPanel center = new JPanel();
-		center.setLayout(new FlowLayout());
-		JButton addButton = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
-		JTextField urlField = new JTextField(15);
-		center.add(urlField);
-		center.add(addButton);
 		content.add(center, BorderLayout.CENTER);
 		frame.setLocation(220, 300);
 		frame.pack();
 		frame.setVisible(true);
 
-		AddDownloadBox box = new AddDownloadBox(urlField);
+		AddDownloadBox box = new AddDownloadBox(urlField, directoryField);
 		new AddDownloadButton(addButton, box, frame);
 	}
 }

@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -25,6 +24,10 @@ public class DownloadTableModel extends DefaultTableModel {
 	protected int mSortColumn = -1;
 	/** Boolean representing whether sorting is done ascending or descending. */
 	protected boolean mIsSortAsc = true;
+
+	int dClkRes = 300;    // double-click speed in ms
+	long timeMouseDown=0; // last mouse down time
+	int lastX=0,lastY=0;  //  last x and y
 
 	/**
 	 * The columns in this table.
@@ -103,10 +106,9 @@ public class DownloadTableModel extends DefaultTableModel {
 	 * @param row The row to remove.
 	 */
 	public void removeDownloadView(int row) {
-		Vector vector = (Vector)mRows.remove(row);
+		Vector<DownloadRenderer> vector = mRows.remove(row);
 		mViews.remove(vector);
 		this.fireTableRowsDeleted(row, row);
-
 	}
 
 	/**
@@ -115,7 +117,7 @@ public class DownloadTableModel extends DefaultTableModel {
 	 */
 	public void sortRowsByColumn(int column) {
 		if (column > 0 && column < Columns.values().length) {
-			Collections.sort((Vector)mRows, new ColumnComparator<DownloadRenderer>(mIsSortAsc, column));
+			Collections.sort(mRows, new ColumnComparator<Vector<DownloadRenderer>>(mIsSortAsc, column));
 		}
 	}
 
@@ -138,16 +140,15 @@ public class DownloadTableModel extends DefaultTableModel {
 	/**
 	 * Get a row that a certain view is in.
 	 * @param view The view that's in the row.
-	 * @return The row, as an integer, where the view is located.
+	 * @return The row, as an integer, where the view is located
+	 * or <tt>-1</tt> if the view is not in any row.
 	 */
 	public int getRowForView(DownloadView view) {
-		int i = 0;
-		do {
-			if (((DownloadRenderer)mRows.get(i).get(3)) == (view.getProgressBarRenderer())) {
+		for (int i = 0; i < mRows.size(); i++) {
+			if (getViewAt(i) == view) {
 				return i;
 			}
-			i++;
-		} while (i < mRows.size());
+		} 
 
 		return -1;
 	}
@@ -175,12 +176,11 @@ public class DownloadTableModel extends DefaultTableModel {
 			int modelIndex = colModel.getColumn(columnModelIndex).getModelIndex();
 
 			if (mSortColumn == modelIndex) {
-				if (mIsSortAsc) {
-					mIsSortAsc = !mIsSortAsc;
-				} else {
+				if (!mIsSortAsc) {
 					mSortColumn = -1;
-					mIsSortAsc = true;
 				}
+				
+				mIsSortAsc = !mIsSortAsc;
 			} else {
 				mSortColumn = modelIndex;
 			}
@@ -188,10 +188,8 @@ public class DownloadTableModel extends DefaultTableModel {
 				TableColumn col = colModel.getColumn(i);
 				 col.setHeaderValue(getColumnName( col.getModelIndex()));
 			}
-			DownloadView[] views = mQueue.getSelectedViews();
-			sortRowsByColumn(mSortColumn);
-			fireTableDataChanged();
-			mQueue.selectViews(views);
+
+			mQueue.sort();
 		}
 	}
 }

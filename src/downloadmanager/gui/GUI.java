@@ -42,63 +42,25 @@ public class GUI implements DownloadObserver {
 	private ArrayList<JButton> mButtons;
 
 	/**
-	 * Sort type enum for sorting downloads in the queue.
-	 * Backward represents descending, otherwise it's ascending order.
-	 */
-	public enum SortType {
-
-		/** Sort by queue position (i.e the objects' own order). */
-		POSITION(1),
-		/** Sort by filename. */
-		FILENAME(2),
-		/** Sort by downloaded size. */
-		DOWNLOADED(4),
-		/** Sort by estimated time of arrival */
-		ETA(8),
-		/** Sort by percent done. */
-		PERCENT(16),
-		/** Take any sort method and do it in backward (descending) order. */
-		BACKWARD(32);
-		/** This enum's flag. */
-		private int mFlag;
-
-		/**
-		 * Construct an enum.
-		 * @param flag The flag this enum uses.
-		 */
-		SortType(int flag) {
-			mFlag = flag;
-		}
-
-		/**
-		 * Get the enum's flag.
-		 * @return The flag of the enum.
-		 */
-		public int getFlag() {
-			return mFlag;
-		}
-	}
-
-	/**
 	 * Private constructor for GUI.
 	 */
 	private GUI() {
 		DownloadTableModel model = new DownloadTableModel();
 		mQueue = new DownloadQueue(model);
 		mButtons = new ArrayList<JButton>();
+
 		mButtons.add(mStartButton = new JButton(IconStore.INSTANCE.getImageIcon("start.png")));
 		mButtons.add(mStopButton = new JButton(IconStore.INSTANCE.getImageIcon("stop.png")));
 		mButtons.add(mRemoveButton = new JButton(IconStore.INSTANCE.getImageIcon("remove.png")));
 		mButtons.add(mMoveUpQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("up.png")));
 		mButtons.add(mMoveDownQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("down.png")));
-
-		setupGUI();
 	}
+
 
 	/**
 	 * Set up the gui with a frame and buttons.
 	 */
-	private void setupGUI() {
+	public void init() {
 		for (JButton b : mButtons) {
 			String[] split = b.toString().split("/");
 			split = split[split.length - 1].split(",");
