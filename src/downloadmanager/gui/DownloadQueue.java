@@ -1,5 +1,6 @@
 package downloadmanager.gui;
 
+import downloadmanager.DownloadLogger;
 import downloadmanager.DownloadManager;
 import downloadmanager.gui.viewStates.CompletedViewState;
 import downloadmanager.gui.viewStates.ErrorViewState;
@@ -20,10 +21,17 @@ import downloadmanager.states.ErrorState;
 import downloadmanager.states.InactiveState;
 import downloadmanager.states.PendingState;
 import downloadmanager.states.StatusState;
+import java.awt.Desktop;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
@@ -38,6 +46,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 	private HashMap<DownloadObject, DownloadView> mDownloadViews;
 	/** The table model for this table */
 	DownloadTableModel mTableModel;
+
 
 	/**
 	 * Construct a download queue.
@@ -60,6 +69,36 @@ public class DownloadQueue extends JTable implements ActionListener {
 		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex("#"));
 		position.setCellRenderer(new PositionRenderer(""));
 		position.setMaxWidth(20);
+
+		// Double click to open file.
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					try {
+						Point p = e.getPoint();
+						int row = rowAtPoint(p);
+						String destination = mTableModel.getViewAt(row).getDownloadObject().getDestination();
+						if (Desktop.isDesktopSupported()) {
+							Desktop.getDesktop().open(new File(destination));
+						}
+					} catch (IOException ex) {
+						DownloadLogger.LOGGER.log(Level.SEVERE, null, ex);
+					}
+				}
+			}
+		});
+
+	}
+
+	/**
+	 * Sort the table whilst keeping the selections.
+	 */
+	public void sort() {
+		DownloadView[] views = getSelectedViews();
+		mTableModel.sortRows();
+		mTableModel.fireTableDataChanged();
+		selectViews(views);
 	}
 
 	/**
@@ -124,10 +163,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 			}
 		}
 
-		DownloadView[] views = getSelectedViews();
-		mTableModel.sortRows();
-		mTableModel.fireTableDataChanged();
-		selectViews(views);
+		sort();
 	}
 
 	/**
@@ -197,7 +233,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		 */
 		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
 			int previousPos = 0;
-			Arrays.sort(views, new QueueComparator<DownloadView>());			
+			Arrays.sort(views, new QueueComparator<DownloadView>());
 			for (DownloadView view : views) {
 				if (!view.getQueuePosition().equals("")) {
 					previousPos++;

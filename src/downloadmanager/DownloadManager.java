@@ -20,6 +20,8 @@ public class DownloadManager implements DownloadObserver {
 	public static final DownloadManager INSTANCE = new DownloadManager();
 	/** Variable representing how many downloads can be active at once. */
 	private int mMaxDownloads = 3;
+	/** Default directory location */
+	private String mDefaultDirectory = "C:/downloads/";
 	/** List of active download objects. */
 	private ArrayList<DownloadObject> mActiveList;
 	/** List of inactive download objects. */
@@ -55,6 +57,21 @@ public class DownloadManager implements DownloadObserver {
 
 		mActiveList.add(downloadObject);
 		return true;
+	}
+
+	/**
+	 * @return The default directory for new downloads.
+	 */
+	public String getDefaultDirectory() {
+		return mDefaultDirectory;
+	}
+
+	/**
+	 * Set the default directory.
+	 * @param directory The directory to set to.
+	 */
+	public void setDefaultDirectory(String directory) {
+		mDefaultDirectory = directory;
 	}
 
 	/**
@@ -140,8 +157,20 @@ public class DownloadManager implements DownloadObserver {
 	 * @throws MalformedURLException if the URL is not a valid URL.
 	 */
 	public DownloadObject addDownload(String URL) throws MalformedURLException {
+		return addDownload(URL, mDefaultDirectory);
+	}
+
+	/**
+	 * Add a download to the download manager.
+	 * @param URL The url at which the download is located.
+	 * @param directory The directory to download to.
+	 * @return The download object that was added.
+	 * @throws MalformedURLException if the URL is not a valid URL.
+	 */
+	public DownloadObject addDownload(String URL, String directory) throws MalformedURLException {
 		URL verifiedURL = verifyUrl(URL);
 		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
+		downloadObject.setDirectory(directory);
 		mInactiveList.add(downloadObject);
 		downloadObject.addListener(this);
 		return downloadObject;

@@ -47,7 +47,8 @@ public class AddDownloadButton extends Button {
 	@Override
 	public void push() {
 		try {
-			DownloadObject dO = DownloadManager.INSTANCE.addDownload(mAddDownloadBox.getURLTextField().getText());
+			DownloadObject dO = DownloadManager.INSTANCE.addDownload(mAddDownloadBox.getURLTextField().getText(),
+					mAddDownloadBox.getDirectoryTextField().getText());
 			GUI.INSTANCE.addDownloadObject(dO);
 			mFrame.dispose();
 		} catch (MalformedURLException me) {
