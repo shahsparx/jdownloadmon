@@ -16,14 +16,10 @@ public class QueueComparator<T extends DownloadView> implements Comparator<T> {
 	 * @return A negative integer, 0 or a positive integer depending on whehter firstView is less, equal to or greater than secondView.
 	 */
 	public int compare(T firstView, T secondView) {
-		String first = firstView.getQueuePosition();
-		String second = secondView.getQueuePosition();
-		//Empty strings will end up first.
-		if (first.equals("") || second.equals("")) {
-			return first.compareTo(second);
-		}
+		int first = firstView.getQueuePosition();
+		int second = secondView.getQueuePosition();
 
-		return Integer.parseInt(first) - Integer.parseInt(second);
+		return first - second;
 	}
 
 }

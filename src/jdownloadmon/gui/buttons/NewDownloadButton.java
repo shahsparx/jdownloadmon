@@ -1,15 +1,16 @@
-package jdownloadmon.gui;
+package jdownloadmon.gui.buttons;
 
+import jdownloadmon.gui.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 /**
  * The class for performing the action when the new download button is pushed.
@@ -25,40 +26,41 @@ public class NewDownloadButton extends Button {
 	public NewDownloadButton(JButton button) {
 		super(button);
 		button.setToolTipText("new");
-		button.setFocusPainted(false);
 	}
 
 	@Override
 	public void push() {
-		JPanel url = new JPanel(new GridLayout(2,2));
-		JPanel directory = new JPanel(new GridLayout(2,2));
+		FlowLayout flow = new FlowLayout(SwingConstants.RIGHT);
+
+		JPanel urlPanel = new JPanel(flow);
+		JPanel directoryPanel = new JPanel(flow);
 		JPanel buttons = new JPanel(new FlowLayout());
-
-		JTextField urlField = new JTextField(20);
+		
+		JTextField urlField = new JTextField(40);
 		JLabel urlLabel = new JLabel("URL:");
-		url.add(urlLabel);
-		url.add(urlField);
+		urlLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		urlPanel.add(urlLabel);
+		urlPanel.add(urlField);
 
-		JTextField directoryField = new JTextField(20);
+		JTextField directoryField = new JTextField(40);
 		JLabel directoryLabel = new JLabel("Directory:");
-		directory.add(directoryLabel);
-		directory.add(directoryField);
+		directoryLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		directoryPanel.add(directoryLabel);
+		directoryPanel.add(directoryField);
 		
 		JButton addButton = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
 		buttons.add(addButton);
 
 		JPanel center = new JPanel();
+		center.setBorder(new EmptyBorder(5,5,5,5));
 		center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
 		
-		center.add(url);
-		center.add(directory);
+		center.add(urlPanel);
+		center.add(directoryPanel);
 		center.add(buttons);
-		JFrame frame = new JFrame("New Download");
+		DownloadFrame frame = new DownloadFrame("New Download");
 		Container content = frame.getContentPane();
 		content.add(center, BorderLayout.CENTER);
-		frame.setLocation(220, 300);
-		frame.pack();
-		frame.setVisible(true);
 
 		AddDownloadBox box = new AddDownloadBox(urlField, directoryField);
 		new AddDownloadButton(addButton, box, frame);

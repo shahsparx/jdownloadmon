@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import javax.swing.JFileChooser;
 
 /**
  * The download manager keeps track of download objects and moves them around its lists.
@@ -20,12 +21,8 @@ public class DownloadManager implements DownloadObserver {
 
 	/** The singleton instance of this DownloadManager. */
 	public static final DownloadManager INSTANCE = new DownloadManager();
-	/** Variable representing how many downloads can be active at once. */
-	private int mMaxDownloads = 3;
-	/** Default directory location */
-	private String mDefaultDirectory = "C:/downloads/";
-	/** Default file exists behavior */
-	private DefaultFileExistsBehavior mDefaultFileExistsBehavior = DefaultFileExistsBehavior.RENAME;
+	/** The config file with the settings. */
+	private XMLConfigFile mConfigFile;
 	/** List of active download objects. */
 	private ArrayList<DownloadObject> mActiveList;
 	/** List of inactive download objects. */
@@ -36,6 +33,8 @@ public class DownloadManager implements DownloadObserver {
 	private ArrayList<DownloadObject> mCompletedList;
 	/** List of download objects with errors. */
 	private ArrayList<DownloadObject> mErrorList;
+	/** List of URLs in the manager. */
+	private ArrayList<URL> mURLs;
 
 	/**
 	 * Enum for defaul file exist behaviors.
@@ -58,26 +57,34 @@ public class DownloadManager implements DownloadObserver {
 		mPendingList = new ArrayList<DownloadObject>();
 		mCompletedList = new ArrayList<DownloadObject>();
 		mErrorList = new ArrayList<DownloadObject>();
+		mURLs = new ArrayList<URL>();
 	}
 
 	/**
 	 * Initialize settings.
 	 */
 	public void init() {
+		// If the config.xml file does not exist, these settings will be used and written to that file.
+		int maxDownloads = 3;
+		DefaultFileExistsBehavior defaultFileExistsBehavior = DefaultFileExistsBehavior.RESUME;
+		String defaultDirectory = new JFileChooser().getFileSystemView().getDefaultDirectory() + File.separator + "Downloads";
+
+		XMLConfigFile file = null;
 		try {
-			XMLConfigFile file = null;
 			file = XMLConfigFile.loadFile();
 			if (file != null) {
-				mDefaultDirectory = file.getDefaultDirectory();
-				mMaxDownloads = file.getMaxDownloads();
-				mDefaultFileExistsBehavior = file.getDefaultFileExistsBehavior();
+				defaultDirectory = file.getDefaultDirectory();
+				maxDownloads = file.getMaxDownloads();
+				defaultFileExistsBehavior = file.getDefaultFileExistsBehavior();
 			} else {
-				file = new XMLConfigFile(mDefaultDirectory, mMaxDownloads, mDefaultFileExistsBehavior);
+				file = new XMLConfigFile(defaultDirectory, maxDownloads, defaultFileExistsBehavior);
 				file.saveFile();
 			}
 		} catch (Exception e) {
 			DownloadLogger.LOGGER.log(Level.SEVERE, e.toString());
 		}
+
+		mConfigFile = file;
 	}
 
 	/**
@@ -85,14 +92,19 @@ public class DownloadManager implements DownloadObserver {
 	 * @param configFile The xml config file with the settings.
 	 */
 	public void saveSettings(XMLConfigFile configFile) {
-		mDefaultDirectory = configFile.getDefaultDirectory();
-		mMaxDownloads = configFile.getMaxDownloads();
-		mDefaultFileExistsBehavior = configFile.getDefaultFileExistsBehavior();
+		mConfigFile = configFile;
 		try {
-			configFile.saveFile();
+			mConfigFile.saveFile();
 		} catch (Exception e) {
 			DownloadLogger.LOGGER.log(Level.SEVERE, e.toString());
 		}
+	}
+
+	/**
+	 * @return The xml config file with the settings of this download manager.
+	 */
+	public XMLConfigFile getSettings() {
+		return mConfigFile;
 	}
 
 	/**
@@ -102,7 +114,7 @@ public class DownloadManager implements DownloadObserver {
 	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToActiveList(DownloadObject downloadObject) {
-		if (mActiveList.size() >= mMaxDownloads) {
+		if (mActiveList.size() >= mConfigFile.getMaxDownloads()) {
 			return false;
 		}
 
@@ -114,7 +126,7 @@ public class DownloadManager implements DownloadObserver {
 	 * @return The default directory for new downloads.
 	 */
 	public String getDefaultDirectory() {
-		return mDefaultDirectory;
+		return mConfigFile.getDefaultDirectory();
 	}
 
 	/**
@@ -198,9 +210,10 @@ public class DownloadManager implements DownloadObserver {
 	 * @param URL The url at which the download is located.
 	 * @return The download object that was added.
 	 * @throws MalformedURLException if the URL is not a valid URL.
+	 * @throws URLAlreadyExistsException if the URL already exists in the download manager in some other download object.
 	 */
-	public DownloadObject addDownload(String URL) throws MalformedURLException {
-		return addDownload(URL, mDefaultDirectory);
+	public DownloadObject addDownload(String URL) throws MalformedURLException, URLAlreadyExistsException {
+		return addDownload(URL, mConfigFile.getDefaultDirectory());
 	}
 
 	/**
@@ -209,28 +222,35 @@ public class DownloadManager implements DownloadObserver {
 	 * @param directory The directory to download to.
 	 * @return The download object that was added.
 	 * @throws MalformedURLException if the URL is not a valid URL.
+	 * @throws URLAlreadyExistsException if the URL already exists in the download manager in some other download object.
 	 */
-	public DownloadObject addDownload(String URLString, String directory) throws MalformedURLException {
-		// TODO shouldn't be able to have two object with the same URL's. Keep track of the URLs in an arraylist.
+	public DownloadObject addDownload(String URLString, String directory) 
+			throws MalformedURLException, URLAlreadyExistsException {
 		URL verifiedURL = verifyUrl(URLString);
+		for (URL url : mURLs) {
+			if (url.equals(verifiedURL)) {
+				throw new URLAlreadyExistsException("This URL already exists.");
+			}
+		}
+
+		mURLs.add(verifiedURL);
 		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
 		downloadObject.addListener(this);
 		mInactiveList.add(downloadObject);
 		downloadObject.setDirectory(directory);
 		
 		String path = directory;
-		if (!directory.endsWith("/") &! directory.endsWith("\\")) {
-			path += "/";
+		if (!directory.endsWith(File.separator)) {
+			path += File.separator;
 		}
 		path += URLString.substring(URLString.lastIndexOf('/') + 1);
 		File file = new File(path);
 		
 		if (file.exists()) {
-			System.out.println(mDefaultFileExistsBehavior);
-			if (mDefaultFileExistsBehavior.equals(DefaultFileExistsBehavior.REPLACE)) {
+			if (mConfigFile.getDefaultFileExistsBehavior().equals(DefaultFileExistsBehavior.REPLACE)) {
 				file.delete();
 			}
-			if (mDefaultFileExistsBehavior.equals(DefaultFileExistsBehavior.RENAME)) {
+			if (mConfigFile.getDefaultFileExistsBehavior().equals(DefaultFileExistsBehavior.RENAME)) {
 				int i = 1;
 				int pos = path.lastIndexOf(".");
 				if (pos == -1) {
@@ -238,6 +258,7 @@ public class DownloadManager implements DownloadObserver {
 				}
 
 				String newPath;
+
 				do {
 					newPath = path.substring(0, pos) + "(" + i + ")" + path.substring(pos);
 					file = new File(newPath);
@@ -247,7 +268,7 @@ public class DownloadManager implements DownloadObserver {
 				downloadObject.setPath(newPath);
 			}
 		}
-		
+
 		return downloadObject;
 	}
 
@@ -258,7 +279,9 @@ public class DownloadManager implements DownloadObserver {
 	 * @throws MalformedURLException if the URL is not a valid URL.
 	 */
 	private URL verifyUrl(String url) throws MalformedURLException {
-		// TODO better use regex here
+		/* TODO Regex for http/ftp
+		 * ^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$
+		 */
 		// Only allow HTTP URLs.
 		if (!url.toLowerCase().startsWith("http://")) {
 			throw new MalformedURLException("Must start with http://");
@@ -288,7 +311,7 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	private void updatePendingList() {
 		// if an active download has stopped downloading, activate top pending download.
-		if (mPendingList.size() > 0 && mActiveList.size() < mMaxDownloads) {
+		if (mPendingList.size() > 0 && mActiveList.size() < mConfigFile.getMaxDownloads()) {
 			DownloadObject pending = mPendingList.get(0);
 			pending.changeStatusState(new ActiveState(pending));
 		}
@@ -299,8 +322,8 @@ public class DownloadManager implements DownloadObserver {
 	 * @param downloadObject The download object to get the queue position of.
 	 * @return the download's queue position.
 	 */
-	public String getActiveQueuePosition(DownloadObject downloadObject) {
-		return Integer.toString(mActiveList.indexOf(downloadObject) + 1);
+	public int getActiveQueuePosition(DownloadObject downloadObject) {
+		return mActiveList.indexOf(downloadObject) + 1;
 	}
 
 	/**
@@ -308,8 +331,8 @@ public class DownloadManager implements DownloadObserver {
 	 * @param downloadObject The download object to get the queue position of.
 	 * @return the download's queue position.
 	 */
-	public String getPendingQueuePosition(DownloadObject downloadObject) {
-		return Integer.toString(mActiveList.size() + mPendingList.indexOf(downloadObject) + 1);
+	public int getPendingQueuePosition(DownloadObject downloadObject) {
+		return mActiveList.size() + mPendingList.indexOf(downloadObject) + 1;
 	}
 
 	/**
@@ -396,5 +419,14 @@ public class DownloadManager implements DownloadObserver {
 		mPendingList.add(0, bottomPending);
 		// Now there're two of the same, so remove the one left at the bottom.
 		mPendingList.remove(mPendingList.size() - 1);
+	}
+
+	/**
+	 * Rmove a download from the download manager.
+	 * Actually only removes the URL from the manager's list of URLs.
+	 * @param downloadObject Which download object to remove.
+	 */
+	public void removeDownload(DownloadObject downloadObject) {
+		mURLs.remove(downloadObject.getConnection().getURL());
 	}
 }

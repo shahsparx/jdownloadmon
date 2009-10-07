@@ -29,7 +29,12 @@ public class PendingState extends StatusState {
 
 	@Override
 	public boolean changeTo() {
-		return DownloadManager.INSTANCE.addToPendingList(mDownloadObject);
+		if (DownloadManager.INSTANCE.addToPendingList(mDownloadObject)) {
+		mDownloadObject.setStatusState(this);
+		return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -38,7 +43,7 @@ public class PendingState extends StatusState {
 	}
 
 	@Override
-	public String getQueuePosition() {
+	public int getQueuePosition() {
 		return DownloadManager.INSTANCE.getPendingQueuePosition(mDownloadObject);
 	}
 

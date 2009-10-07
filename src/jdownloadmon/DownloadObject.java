@@ -1,5 +1,6 @@
 package jdownloadmon;
 
+import java.io.File;
 import jdownloadmon.states.ActiveState;
 import jdownloadmon.states.StatusState;
 import jdownloadmon.states.ErrorState;
@@ -58,7 +59,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 * @throws IllegalStateException if the download object is currently downloading.
 	 */
 	public void setDirectory(String directory) throws IllegalStateException {
-		mDestination = directory + mDownloadConnection.getFileName();
+		mDestination = directory + File.separator + mDownloadConnection.getFileName();
 	}
 
 	/**
@@ -236,7 +237,7 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	/**
 	 * @return The queue position of this download.
 	 */
-	public String getQueuePosition() {
+	public int getQueuePosition() {
 		return mStatusState.getQueuePosition();
 	}
 

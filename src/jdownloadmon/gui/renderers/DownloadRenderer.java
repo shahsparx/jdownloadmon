@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * and what color the selected/deselected background should be.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public abstract class DownloadRenderer extends DefaultTableCellRenderer {
+public abstract class DownloadRenderer extends DefaultTableCellRenderer implements Comparable<DownloadRenderer> {
 
 	/**
 	 * Protected constructor to set some default behavior for cell renderers.
@@ -36,4 +36,8 @@ public abstract class DownloadRenderer extends DefaultTableCellRenderer {
 
 	@Override
 	public abstract String toString();
+
+	public int compareTo(DownloadRenderer o) {
+		return toString().compareTo(o.toString());
+	}
 }

@@ -41,7 +41,12 @@ public class ErrorState extends StatusState {
 
 	@Override
 	public boolean changeTo() {
-		return DownloadManager.INSTANCE.addToErrorList(mDownloadObject);
+		if (DownloadManager.INSTANCE.addToErrorList(mDownloadObject)) {
+		mDownloadObject.setStatusState(this);
+		return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -50,8 +55,8 @@ public class ErrorState extends StatusState {
 	}
 
 	@Override
-	public String getQueuePosition() {
-		return "";
+	public int getQueuePosition() {
+		return Integer.MAX_VALUE;
 	}
 
 	@Override

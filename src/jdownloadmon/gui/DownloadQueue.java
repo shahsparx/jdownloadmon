@@ -97,8 +97,6 @@ public class DownloadQueue extends JTable implements ActionListener {
 	public void addDownloadView(DownloadView downloadView) {
 		mDownloadViews.put(downloadView.getDownloadObject(), downloadView);
 		mTableModel.addDownloadView(downloadView);
-		downloadView.getDownloadObject().updateSizes();
-		downloadView.updateSize();
 	}
 
 	/**
@@ -211,6 +209,8 @@ public class DownloadQueue extends JTable implements ActionListener {
 		if (source.equals(GUI.INSTANCE.getStartButton())) {
 			for (DownloadView view : views) {
 				view.getDownloadObject().download();
+				view.getDownloadObject().updateSizes();
+				view.updateSize();
 			}
 		} else if (source.equals(GUI.INSTANCE.getStopButton())) {
 			for (DownloadView view : views) {
@@ -223,6 +223,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 				DownloadObject downloadObject = view.getDownloadObject();
 				downloadObject.remove();
 				removeDownloadView(downloadObject);
+				DownloadManager.INSTANCE.removeDownload(downloadObject);
 				mTableModel.removeDownloadView(row);
 			}
 		/*
@@ -234,9 +235,9 @@ public class DownloadQueue extends JTable implements ActionListener {
 			int previousPos = 0;
 			Arrays.sort(views, new QueueComparator<DownloadView>());
 			for (DownloadView view : views) {
-				if (!view.getQueuePosition().equals("")) {
+				if (view.getQueuePosition() != Integer.MAX_VALUE) {
 					previousPos++;
-					int pos = Integer.parseInt(view.getQueuePosition());
+					int pos = view.getQueuePosition();
 					if (pos != previousPos) {
 						DownloadObject downloadObject = view.getDownloadObject();
 						if (downloadObject.getStatusState() instanceof ActiveState) {
@@ -253,9 +254,9 @@ public class DownloadQueue extends JTable implements ActionListener {
 			int previousPos = DownloadManager.INSTANCE.getNumberOfQueuedDownloads()+1;
 			for (int i = views.length-1; i >= 0; i--) {
 				DownloadView view = views[i];
-				if (!view.getQueuePosition().equals("")) {
+				if (view.getQueuePosition() != Integer.MAX_VALUE) {
 					previousPos--;
-					int pos = Integer.parseInt(view.getQueuePosition());
+					int pos = view.getQueuePosition();
 					if (pos != previousPos) {
 						DownloadObject downloadObject = view.getDownloadObject();
 						if (downloadObject.getStatusState() instanceof ActiveState) {
