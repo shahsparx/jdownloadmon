@@ -233,7 +233,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		 */
 		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
 			int previousPos = 0;
-			Arrays.sort(views, new QueueComparator<DownloadView>());
+			Arrays.sort(views, new ColumnComparator(true, 0));
 			for (DownloadView view : views) {
 				if (view.getQueuePosition() != Integer.MAX_VALUE) {
 					previousPos++;
@@ -250,7 +250,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 			}
 			updateQueueingPositions();
 		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {
-			Arrays.sort(views, new QueueComparator<DownloadView>());
+			Arrays.sort(views, new ColumnComparator(true, 0));
 			int previousPos = DownloadManager.INSTANCE.getNumberOfQueuedDownloads()+1;
 			for (int i = views.length-1; i >= 0; i--) {
 				DownloadView view = views[i];
