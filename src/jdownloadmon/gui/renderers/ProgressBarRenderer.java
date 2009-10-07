@@ -52,4 +52,13 @@ public class ProgressBarRenderer extends DownloadRenderer {
 	public String toString() {
 		return mProgressBar.getString();
 	}
+
+	@Override
+	public int compareTo(DownloadRenderer o) {
+		if (o instanceof ProgressBarRenderer) {
+			return (int) (mProgressBar.getValue() - ((ProgressBarRenderer) o).mProgressBar.getValue());
+		}
+
+		return super.compareTo(o);
+	}
 }

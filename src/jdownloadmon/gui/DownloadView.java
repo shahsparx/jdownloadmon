@@ -1,12 +1,12 @@
 package jdownloadmon.gui;
 
+import java.io.File;
 import jdownloadmon.gui.viewStates.ViewState;
 import jdownloadmon.DownloadObject;
 import jdownloadmon.gui.renderers.ProgressBarRenderer;
 import jdownloadmon.gui.renderers.TextRenderer;
+import jdownloadmon.gui.renderers.ValueRenderer;
 import jdownloadmon.gui.renderers.ViewStateRenderer;
-import jdownloadmon.states.ActiveState;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A download component is a viewable download object.
@@ -21,15 +21,15 @@ public class DownloadView {
 	/** The progress bar renderer of this download view. */
 	private ProgressBarRenderer mProgressBarRenderer;
 	/** The position renderer of this download view. */
-	private TextRenderer mPositionRenderer;
+	private ValueRenderer mPositionRenderer;
 	/** The filename renderer of this download view. */
 	private TextRenderer mFilenameRenderer;
 	/** The size renderer of this download view. */
-	private TextRenderer mSizeRenderer;
+	private ValueRenderer mSizeRenderer;
 	/** The ETA renderer of this download view. */
-	private TextRenderer mETARenderer;
+	private ValueRenderer mETARenderer;
 	/** The speed renderer of this download view. */
-	private TextRenderer mSpeedRenderer;
+	private ValueRenderer mSpeedRenderer;
 
 
 
@@ -43,10 +43,10 @@ public class DownloadView {
 		mViewStateRenderer = viewStateRenderer;
 		mProgressBarRenderer = new ProgressBarRenderer();
 		mFilenameRenderer = new TextRenderer(getFileName());
-		mPositionRenderer = new TextRenderer(getQueuePosition());
-		mSizeRenderer = new TextRenderer(getSize());
-		mETARenderer = new TextRenderer(getETA());
-		mSpeedRenderer = new TextRenderer(getSpeed());
+		mPositionRenderer = new ValueRenderer("", getQueuePosition());
+		mSizeRenderer = new ValueRenderer(getSize(), downloadObject.getSize());
+		mETARenderer = new ValueRenderer(getETA(), downloadObject.getETA());
+		mSpeedRenderer = new ValueRenderer(getSpeed(), (long)downloadObject.getSpeed());
 	}
 
 	/**
@@ -74,33 +74,7 @@ public class DownloadView {
 	 * @return The speed, in kiB/s.
 	 */
 	public String getSpeed() {
-		double speed = mDownloadObject.getSpeed();
-		if (speed > 0) {
-			int counter = 0;
-			while (speed > 10000) {
-				speed /= 1000;
-				counter++;
-			}
-			
-			String unit;
-			if (counter == 0) {
-				unit = "B/s";
-			} else if (counter == 1) {
-				unit = "kB/s";
-			} else if (counter == 2) {
-				unit = "MB/s";
-			} else if (counter == 3) {
-				unit = "GB/s";
-			} else if (counter == 4) {
-				unit = "TB/s";
-			} else {
-				unit = "w00t/s";
-			}
-
-			return String.format("%02.1f", speed) + " " + unit;
-		} else {
-			return "";
-		}
+		return getValueString(mDownloadObject.getSpeed(), "B/s", "%.1f");
 	}
 
 	/**
@@ -120,9 +94,9 @@ public class DownloadView {
 
 
 			return days + "d:" + hours + "h:" + minutes + "m:" + seconds + "s";
-		} else {
-			return "";
 		}
+
+		return "";
 	}
 
 	/**
@@ -130,6 +104,7 @@ public class DownloadView {
 	 */
 	public void updateETA() {
 		mETARenderer.setDisplayText(getETA());
+		mETARenderer.setValue(mDownloadObject.getETA());
 	}
 
 	/**
@@ -137,6 +112,7 @@ public class DownloadView {
 	 */
 	public void updateSpeed() {
 		mSpeedRenderer.setDisplayText(getSpeed());
+		mSpeedRenderer.setValue((long)mDownloadObject.getSpeed());
 	}
 
 	/**
@@ -144,13 +120,44 @@ public class DownloadView {
 	 */
 	public void updateSize() {
 		mSizeRenderer.setDisplayText(getSize());
+		mSizeRenderer.setValue(mDownloadObject.getSize());
 	}
 
 	/**
 	 * @return The size, in kibibytes of this download view's download object.
 	 */
 	public String getSize() {
-		return mDownloadObject.getSize() / 1024 + " kiB";
+		return getValueString(mDownloadObject.getSize(), "B", "%.2f");
+	}
+
+	/**
+	 * Get a String representation of a certain value. Used for converting to kilo, mega etc.
+	 * @param value The value that is to be represented as a string.
+	 * @param unit The unit of the value.
+	 * @param format The format to use, for example "%.2f" for two decimals.
+	 * @return
+	 */
+	private String getValueString(double value, String unit, String format) {
+		String[] multipliers = {"","k","M","G","T","P","E","Z","Y","X","W","V","U"};
+		if (value > 0) {
+			int counter = 0;
+			while (value > 1000) {
+				value /= 1000;
+				counter++;
+			}
+
+			String multiplier;
+
+			if (counter >= multipliers.length) {
+				multiplier = "ultra";
+			}
+
+			multiplier = multipliers[counter];
+
+			return String.format(format, value) + " " + multiplier + unit;
+		}
+
+		return "";
 	}
 
 	/**
@@ -190,8 +197,8 @@ public class DownloadView {
 	 * @return The file name and extension of the download object as a <tt>String</tt>.
 	 */
 	public String getFileName() {
-		String[] path = mDownloadObject.getDestination().split("/");
-		return path[path.length - 1];
+		String destination = mDownloadObject.getDestination();
+		return destination.substring(destination.lastIndexOf(File.separatorChar) + 1);
 	}
 
 	/**
@@ -221,7 +228,7 @@ public class DownloadView {
 	/**
 	 * @return The queue position of this download or an empty string if the download is not active or pending.
 	 */
-	public String getQueuePosition() {
+	public int getQueuePosition() {
 		return mDownloadObject.getQueuePosition();
 	}
 
@@ -236,7 +243,13 @@ public class DownloadView {
 	 * Update this download view's queue position.
 	 */
 	public void updateQueuePosition() {
-		mPositionRenderer.setDisplayText(getQueuePosition());
+		int position = getQueuePosition();
+		mPositionRenderer.setValue(position);
+		if (position != Integer.MAX_VALUE) {
+			mPositionRenderer.setDisplayText(Integer.toString(position));
+		} else {
+			mPositionRenderer.setDisplayText("");
+		}
 	}
 
 	/**

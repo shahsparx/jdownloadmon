@@ -26,6 +26,7 @@ public class AddDownloadBox {
 		mURLTextField = urlField;
 		mDirectoryTextField = directoryTextField;
 		mDirectoryTextField.setText(DownloadManager.INSTANCE.getDefaultDirectory());
+		mDirectoryTextField.setToolTipText("Directory Textfield");
 		mURLTextField.setText("http://googleisagiantrobot.com/google-is-a-giant-robot.png");
 		mURLTextField.setToolTipText("URL Textfield");
 		JPopupMenu popup = new JPopupMenu();

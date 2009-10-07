@@ -40,9 +40,6 @@ public class ColumnComparator<T extends Vector<DownloadRenderer>> implements Com
 		String first = firstRenderer.toString();
 		String second = secondRenderer.toString();
 
-		// every other column deals with integers.
-		boolean integerColumn = mColumnIndex % 2 == 0;
-
 		int result = 0;
 		// put empty strings last.
 		if (first.equals("")) {
@@ -54,32 +51,7 @@ public class ColumnComparator<T extends Vector<DownloadRenderer>> implements Com
 		} else if (second.equals("")) {
 			result = -1;
 		} else {
-			// columns that deal with integers.
-			// TODO shouldn't have to get the string and parse it, should be a getValue on the renderer instead that returns a long.
-			// Otherwise it will sort differently for MiB and kiB for instance.
-			if (integerColumn) {
-				String s1 = "";
-				String s2 = "";
-				for (int i = 0; i < first.length(); i++) {
-					char c = first.charAt(i);
-					if (Character.isDigit(c)) {
-						s1 += c;
-					} else {
-						break;
-					}
-				}
-				for (int i = 0; i < second.length(); i++) {
-					char c = second.charAt(i);
-					if (Character.isDigit(c)) {
-						s2 += c;
-					} else {
-						break;
-					}
-				}
-				result = Integer.parseInt(s1) - Integer.parseInt(s2);
-			} else {
-				result = first.compareTo(second);
-			}
+			result = firstRenderer.compareTo(secondRenderer);
 			if (!mIsSortAsc) {
 				result = -result;
 			}

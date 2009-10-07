@@ -1,4 +1,4 @@
-package jdownloadmon.gui;
+package jdownloadmon.gui.buttons;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +19,7 @@ public abstract class Button implements ActionListener {
 	 */
 	protected Button(JButton button) {
 		mButton = button;
+		mButton.setFocusPainted(false);
 		mButton.addActionListener(this);
 	}
 

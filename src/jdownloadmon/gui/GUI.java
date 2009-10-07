@@ -1,5 +1,10 @@
 package jdownloadmon.gui;
 
+
+
+import jdownloadmon.gui.buttons.SettingsButton;
+import jdownloadmon.gui.buttons.AboutButton;
+import jdownloadmon.gui.buttons.NewDownloadButton;
 import jdownloadmon.gui.viewStates.InactiveViewState;
 import jdownloadmon.events.DownloadProgressEvent;
 import jdownloadmon.DownloadObject;
@@ -13,10 +18,10 @@ import java.awt.FlowLayout;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import jdownloadmon.DownloadManager;
 
 /**
  * The GUI for the Download Manager.
@@ -71,42 +76,41 @@ public class GUI implements DownloadObserver {
 			b.addActionListener(mQueue);
 		}
 
-		JPanel topButtonsPanel = new JPanel();
-		topButtonsPanel.setLayout(new FlowLayout());
-		JButton button = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
-		new NewDownloadButton(button);
-		topButtonsPanel.add(button);
+		JPanel topButtonsPanel = new JPanel(new FlowLayout());
+		JButton newDownloadButton = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
+		
+		new NewDownloadButton(newDownloadButton);
+		topButtonsPanel.add(newDownloadButton);
 		topButtonsPanel.add(mStartButton);
 		topButtonsPanel.add(mStopButton);
 		topButtonsPanel.add(mRemoveButton);
 
 
-		JPanel bottomButtonsPanel = new JPanel();
-		bottomButtonsPanel.setLayout(new FlowLayout());
+		JButton settingsButton = new JButton(IconStore.INSTANCE.getImageIcon("config.png"));
+		new SettingsButton(settingsButton);
+		JButton aboutButton = new JButton(IconStore.INSTANCE.getImageIcon("about.png"));
+		new AboutButton(aboutButton);
+		JPanel bottomButtonsPanel = new JPanel(new FlowLayout());
+		bottomButtonsPanel.add(settingsButton);
 		bottomButtonsPanel.add(mMoveUpQueueButton);
 		bottomButtonsPanel.add(mMoveDownQueueButton);
+		bottomButtonsPanel.add(aboutButton);
+
 
 		JPanel middlePanel = new JPanel();
 		JScrollPane pane = new JScrollPane(mQueue);
 		pane.setPreferredSize(new Dimension(600, 400));
 		middlePanel.add(pane);
 
-		JFrame frame = new JFrame("jDownloadMon");
+		DownloadFrame frame = new DownloadFrame("jDownloadMon");
 		Container content = frame.getContentPane();
 
 		content.add(topButtonsPanel, BorderLayout.NORTH);
 		content.add(middlePanel, BorderLayout.CENTER);
 		content.add(bottomButtonsPanel, BorderLayout.SOUTH);
 
-		JMenuBar bar = new JMenuBar();
-		JMenu menu = new JMenu("Options");
-
-		bar.add(menu);
-		frame.setJMenuBar(bar);
-
-		frame.pack();
-		frame.setLocation(200, 200);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
 		frame.setVisible(true);
 	}
 

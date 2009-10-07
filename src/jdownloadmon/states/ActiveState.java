@@ -25,6 +25,9 @@ public class ActiveState extends StatusState {
 	@Override
 	public boolean changeTo() {
 		if (DownloadManager.INSTANCE.addToActiveList(mDownloadObject)) {
+			// Set the status state before starting new thread because the while loop in the run method
+			// depends on the status state being active.
+			mDownloadObject.setStatusState(this);
 			Thread t = new Thread(mDownloadObject);
 			t.start();
 			return true;
@@ -45,7 +48,7 @@ public class ActiveState extends StatusState {
 	}
 
 	@Override
-	public String getQueuePosition() {
+	public int getQueuePosition() {
 		return DownloadManager.INSTANCE.getActiveQueuePosition(mDownloadObject);
 	}
 

@@ -29,7 +29,12 @@ public class InactiveState extends StatusState {
 
 	@Override
 	public boolean changeTo() {
-		return DownloadManager.INSTANCE.addToInactiveList(mDownloadObject);
+		if (DownloadManager.INSTANCE.addToInactiveList(mDownloadObject)) {
+		mDownloadObject.setStatusState(this);
+		return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -38,8 +43,8 @@ public class InactiveState extends StatusState {
 	}
 
 	@Override
-	public String getQueuePosition() {
-		return "";
+	public int getQueuePosition() {
+		return Integer.MAX_VALUE;
 	}
 
 	@Override

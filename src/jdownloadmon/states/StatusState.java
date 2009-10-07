@@ -61,23 +61,16 @@ public abstract class StatusState {
 	public abstract void pause();
 
 	/**
-	 * Change a download object's state from this status state to another.
+	 * Try to change a download object's state from this status state to another.
 	 * @param state The status state to change to.
-	 * @return <tt>true</tt> if the change was successful, <tt>false</tt> if the state could not be changed.
 	 */
-	public boolean changeTo(StatusState state) {
+	public void changeTo(StatusState state) {
 		StatusState oldState = mDownloadObject.getStatusState();
-		// Set the status state before doing changeTo because ActiveState's changeTo creates a new thread that depends on the status state.
-		mDownloadObject.setStatusState(state);
 		if (mDownloadObject != null && state.changeTo()) {
 			DownloadStatusStateEvent event = new DownloadStatusStateEvent(mDownloadObject);
 			mDownloadObject.notifyListeners(event);
 			oldState.changeFrom();
-			return true;
 		}
-
-		mDownloadObject.setStatusState(oldState);
-		return false;
 	}
 
 	/**
@@ -101,5 +94,5 @@ public abstract class StatusState {
 	/**
 	 * @return The download object's queue position, or an empty String if the download is not queuing.
 	 */
-	public abstract String getQueuePosition();
+	public abstract int getQueuePosition();
 }
