@@ -279,9 +279,6 @@ public class DownloadManager implements DownloadObserver {
 	 * @throws MalformedURLException if the URL is not a valid URL.
 	 */
 	private URL verifyUrl(String url) throws MalformedURLException {
-		/* TODO Regex for http/ftp
-		 * ^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$
-		 */
 		// Only allow HTTP URLs.
 		if (!url.toLowerCase().startsWith("http://")) {
 			throw new MalformedURLException("Must start with http://");

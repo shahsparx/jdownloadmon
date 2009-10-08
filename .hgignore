@@ -6,3 +6,4 @@ build/*
 private/*
 dist/*
 *.log*
+config.xml
