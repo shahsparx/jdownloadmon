@@ -85,6 +85,15 @@ public class DownloadManager implements DownloadObserver {
 	}
 
 	/**
+	 * Check if there is room in the active list.
+	 * @return <tt>true</tt> if there is room, <tt>false</tt> otherwise.
+	 */
+	private boolean activeListHasRoom() {
+		int maxDownloads = mConfigFile.getMaxDownloads();
+		return maxDownloads == 0 || mActiveList.size() < maxDownloads;
+	}
+
+	/**
 	 * Save settings
 	 * @param configFile The xml config file with the settings.
 	 */
@@ -111,8 +120,7 @@ public class DownloadManager implements DownloadObserver {
 	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToActiveList(DownloadObject downloadObject) {
-		int maxDownloads = mConfigFile.getMaxDownloads();
-		if (maxDownloads == 0 || mActiveList.size() < maxDownloads) {
+		if (activeListHasRoom()) {
 			return mActiveList.add(downloadObject);
 		}
 
@@ -326,7 +334,7 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	private void updatePendingList() {
 		// if an active download has stopped downloading, activate top pending download.
-		while (mPendingList.size() > 0 && mActiveList.size() < mConfigFile.getMaxDownloads()) {
+		while (mPendingList.size() > 0 && activeListHasRoom()) {
 			DownloadObject pending = mPendingList.get(0);
 			pending.changeStatusState(new ActiveState(pending));
 		}

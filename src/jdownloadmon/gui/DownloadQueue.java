@@ -181,6 +181,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		}
 
 		sort();
+		this.repaint();
 	}
 
 	/**

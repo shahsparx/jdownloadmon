@@ -3,6 +3,14 @@ package jdownloadmon.gui.buttons;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -10,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.DefaultEditorKit;
 import jdownloadmon.gui.AddDownloadBox;
 import jdownloadmon.gui.DownloadFrame;
 import jdownloadmon.gui.IconStore;
@@ -39,6 +48,19 @@ public class NewDownloadButton extends Button {
 		JPanel buttons = new JPanel(new FlowLayout());
 
 		JTextField urlField = new JTextField(48);
+		try {
+			// fetch clipboard into url field.
+			String clipboard = (String)Toolkit.getDefaultToolkit().getSystemClipboard().
+					getContents(urlField).getTransferData(DataFlavor.stringFlavor);
+			if (clipboard.startsWith("http://")) {
+				// test for malformed url exception.
+				new URL(clipboard);
+				urlField.setText(clipboard);
+			}
+		} catch (Exception e) {
+			// ignore
+		}
+
 		JLabel urlLabel = new JLabel("URL:");
 		urlLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		urlPanel.add(urlLabel);
