@@ -1,6 +1,6 @@
 package jdownloadmon.events;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadObject;
 
 /**
  * A download progress event contains information about the percent downloaded of a {@link DownloadObject}.

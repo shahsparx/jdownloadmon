@@ -56,7 +56,7 @@ public class ColumnComparator<T extends Vector<DownloadRenderer>> implements Com
 				result = -result;
 			}
 		}
-		
+
 		return result;
 	}
 }

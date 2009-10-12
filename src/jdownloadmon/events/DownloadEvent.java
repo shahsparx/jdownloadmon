@@ -1,6 +1,6 @@
 package jdownloadmon.events;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadObject;
 
 /**
  * A download progress event contains some information about a {@link DownloadObject}.

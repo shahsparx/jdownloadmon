@@ -1,5 +1,6 @@
 package jdownloadmon;
 
+import jdownloadmon.events.DownloadConnectedEvent;
 import jdownloadmon.events.DownloadStatusStateEvent;
 import jdownloadmon.events.DownloadProgressEvent;
 
@@ -20,4 +21,10 @@ public interface DownloadObserver {
 	 * @param downloadStatusStateEvent The download status state event that was performed.
 	 */
 	public void downloadEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent);
+
+	/**
+	 * A download connected event was performed.
+	 * @param downloadConnectedEvent The download connected event that was performed.
+	 */
+	public void downloadEventPerformed(DownloadConnectedEvent downloadConnectedEvent);
 }

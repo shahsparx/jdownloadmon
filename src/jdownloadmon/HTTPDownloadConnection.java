@@ -74,7 +74,7 @@ public class HTTPDownloadConnection extends DownloadConnection {
 		long size = getSize();
 		HttpClient client = new HttpClient();
 		mRequest = new GetMethod(mURL.toString());
-		
+
 		if (downloaded > 0L) {
 			// server must support partial content for resume
 			mRequest.addRequestHeader("Range", "bytes=" + downloaded + "-");
@@ -84,7 +84,7 @@ public class HTTPDownloadConnection extends DownloadConnection {
 		} else if (client.executeMethod(mRequest) != HttpStatus.SC_OK) {
 			// response not ok
 			throw new IOException("Cannot retrieve file from server.");
-		}		
+		}
 
 		mStream = new BufferedInputStream(mRequest.getResponseBodyAsStream());
 		return size;

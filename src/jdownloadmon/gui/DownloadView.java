@@ -31,8 +31,6 @@ public class DownloadView {
 	/** The speed renderer of this download view. */
 	private ValueRenderer mSpeedRenderer;
 
-
-
 	/**
 	 * Construct a download component.
 	 * @param downloadObject The download object to be viewed.
@@ -46,7 +44,7 @@ public class DownloadView {
 		mPositionRenderer = new ValueRenderer("", getQueuePosition());
 		mSizeRenderer = new ValueRenderer(getSize(), downloadObject.getSize());
 		mETARenderer = new ValueRenderer(getETA(), downloadObject.getETA());
-		mSpeedRenderer = new ValueRenderer(getSpeed(), (long)downloadObject.getSpeed());
+		mSpeedRenderer = new ValueRenderer(getSpeed(), (long) downloadObject.getSpeed());
 	}
 
 	/**
@@ -83,7 +81,6 @@ public class DownloadView {
 	public String getETA() {
 		long eta = mDownloadObject.getETA();
 		if (eta > 0) {
-			eta = mDownloadObject.getETA();
 			long days = eta / (1000 * 60 * 60 * 24);
 			eta -= days * 1000 * 60 * 60 * 24;
 			long hours = eta / (1000 * 60 * 60);
@@ -92,8 +89,21 @@ public class DownloadView {
 			eta -= minutes * 1000 * 60;
 			long seconds = eta / 1000;
 
+			String etaString = "";
+			if (days > 0) {
+				etaString += days +	"d ";
+			}
+			if (hours > 0) {
+				etaString += hours + "h ";
+			}
+			if (minutes > 0) {
+				etaString += minutes + "m ";
+			}
+			if (seconds > 0) {
+				etaString += seconds + "s";
+			}
 
-			return days + "d:" + hours + "h:" + minutes + "m:" + seconds + "s";
+			return etaString;
 		}
 
 		return "";
@@ -112,7 +122,7 @@ public class DownloadView {
 	 */
 	public void updateSpeed() {
 		mSpeedRenderer.setDisplayText(getSpeed());
-		mSpeedRenderer.setValue((long)mDownloadObject.getSpeed());
+		mSpeedRenderer.setValue((long) mDownloadObject.getSpeed());
 	}
 
 	/**
@@ -135,10 +145,10 @@ public class DownloadView {
 	 * @param value The value that is to be represented as a string.
 	 * @param unit The unit of the value.
 	 * @param format The format to use, for example "%.2f" for two decimals.
-	 * @return
+	 * @return The requested value string.
 	 */
 	private String getValueString(double value, String unit, String format) {
-		String[] multipliers = {"","k","M","G","T","P","E","Z","Y","X","W","V","U"};
+		String[] multipliers = {"", "k", "M", "G", "T", "P", "E", "Z", "Y", "X", "W", "V", "U"};
 		if (value > 0) {
 			int counter = 0;
 			while (value > 1000) {
@@ -149,10 +159,11 @@ public class DownloadView {
 			String multiplier;
 
 			if (counter >= multipliers.length) {
-				multiplier = "ultra";
+				// infinity sign.
+				multiplier = Character.toString('\u221E');
+			} else {
+				multiplier = multipliers[counter];
 			}
-
-			multiplier = multipliers[counter];
 
 			return String.format(format, value) + " " + multiplier + unit;
 		}

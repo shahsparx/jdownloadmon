@@ -1,9 +1,10 @@
 package jdownloadmon.states;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadManager;
+import jdownloadmon.DownloadObject;
 
 /**
- * A completed state indicates completion.
+ * The completed state represents the status of a download object when it has finished downloading.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class CompletedState extends StatusState {
@@ -24,14 +25,13 @@ public class CompletedState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromCompletedList(mDownloadObject);
-		mDownloadObject = null;
 	}
 
 	@Override
 	public boolean changeTo() {
 		if (DownloadManager.INSTANCE.addToCompletedList(mDownloadObject)) {
-		mDownloadObject.setStatusState(this);
-		return true;
+			mDownloadObject.setStatusState(this);
+			return true;
 		}
 
 		return false;

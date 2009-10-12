@@ -3,7 +3,9 @@ syntax: glob
 
 *.class
 build/*
+bin/*
 private/*
 dist/*
 *.log*
 config.xml
+downloads.xml

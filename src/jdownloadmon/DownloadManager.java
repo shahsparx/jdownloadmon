@@ -1,6 +1,7 @@
 package jdownloadmon;
 
 import java.io.File;
+import jdownloadmon.events.DownloadConnectedEvent;
 import jdownloadmon.events.DownloadStatusStateEvent;
 import jdownloadmon.events.DownloadProgressEvent;
 import jdownloadmon.states.ActiveState;
@@ -37,9 +38,10 @@ public class DownloadManager implements DownloadObserver {
 	private ArrayList<URL> mURLs;
 
 	/**
-	 * Enum for defaul file exist behaviors.
+	 * Enum for default file exist behaviors.
 	 */
 	public enum DefaultFileExistsBehavior {
+
 		/** Resume the file. */
 		RESUME,
 		/** Rename the file. */
@@ -64,19 +66,14 @@ public class DownloadManager implements DownloadObserver {
 	 * Initialize settings.
 	 */
 	public void init() {
-		// If the config.xml file does not exist, these settings will be used and written to that file.
-		int maxDownloads = 3;
-		DefaultFileExistsBehavior defaultFileExistsBehavior = DefaultFileExistsBehavior.RESUME;
-		String defaultDirectory = new JFileChooser().getFileSystemView().getDefaultDirectory() + File.separator + "Downloads";
-
 		XMLConfigFile file = null;
 		try {
 			file = XMLConfigFile.loadFile();
-			if (file != null) {
-				defaultDirectory = file.getDefaultDirectory();
-				maxDownloads = file.getMaxDownloads();
-				defaultFileExistsBehavior = file.getDefaultFileExistsBehavior();
-			} else {
+			if (file == null) {
+				// If the config.xml file does not exist, these settings will be used and written to that file.
+				int maxDownloads = 3;
+				DefaultFileExistsBehavior defaultFileExistsBehavior = DefaultFileExistsBehavior.RESUME;
+				String defaultDirectory = new JFileChooser().getFileSystemView().getDefaultDirectory() + File.separator + "Downloads";
 				file = new XMLConfigFile(defaultDirectory, maxDownloads, defaultFileExistsBehavior);
 				file.saveFile();
 			}
@@ -114,12 +111,12 @@ public class DownloadManager implements DownloadObserver {
 	 * @return <tt>true</tt> if the download could be added, <tt>false</tt> otherwise.
 	 */
 	public boolean addToActiveList(DownloadObject downloadObject) {
-		if (mActiveList.size() >= mConfigFile.getMaxDownloads()) {
-			return false;
+		int maxDownloads = mConfigFile.getMaxDownloads();
+		if (maxDownloads == 0 || mActiveList.size() < maxDownloads) {
+			return mActiveList.add(downloadObject);
 		}
 
-		mActiveList.add(downloadObject);
-		return true;
+		return false;
 	}
 
 	/**
@@ -207,13 +204,25 @@ public class DownloadManager implements DownloadObserver {
 
 	/**
 	 * Add a download to the download manager.
-	 * @param URL The url at which the download is located.
+	 * @param downloadObject The object to add.
 	 * @return The download object that was added.
 	 * @throws MalformedURLException if the URL is not a valid URL.
 	 * @throws URLAlreadyExistsException if the URL already exists in the download manager in some other download object.
 	 */
-	public DownloadObject addDownload(String URL) throws MalformedURLException, URLAlreadyExistsException {
-		return addDownload(URL, mConfigFile.getDefaultDirectory());
+	public DownloadObject addDownload(DownloadObject downloadObject) throws MalformedURLException, URLAlreadyExistsException {
+		URL verifiedURL = downloadObject.getConnection().getURL();
+		for (URL url : mURLs) {
+			if (url.equals(verifiedURL)) {
+				throw new URLAlreadyExistsException("This URL already exists.");
+			}
+		}
+
+		mURLs.add(verifiedURL);
+		downloadObject.addListener(this);
+		mInactiveList.add(downloadObject);
+		saveDownloadsFile();
+
+		return downloadObject;
 	}
 
 	/**
@@ -224,52 +233,57 @@ public class DownloadManager implements DownloadObserver {
 	 * @throws MalformedURLException if the URL is not a valid URL.
 	 * @throws URLAlreadyExistsException if the URL already exists in the download manager in some other download object.
 	 */
-	public DownloadObject addDownload(String URLString, String directory) 
+	public DownloadObject addDownload(String URLString, String directory)
 			throws MalformedURLException, URLAlreadyExistsException {
+		DownloadObject downloadObject = createDownloadObject(URLString, directory);
+		return addDownload(downloadObject);
+	}
+
+	/**
+	 * Create a new download object.
+	 * @param URLString The url at which the download is located.
+	 * @param directory The directory to download to.
+	 * @return The download object that was added.
+	 * @throws MalformedURLException if the URL is not a valid URL.
+	 */
+	public DownloadObject createDownloadObject(String URLString, String directory) throws MalformedURLException {
 		URL verifiedURL = verifyUrl(URLString);
-		for (URL url : mURLs) {
-			if (url.equals(verifiedURL)) {
-				throw new URLAlreadyExistsException("This URL already exists.");
-			}
-		}
-
-		mURLs.add(verifiedURL);
 		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
-		downloadObject.addListener(this);
-		mInactiveList.add(downloadObject);
 		downloadObject.setDirectory(directory);
-		
-		String path = directory;
-		if (!directory.endsWith(File.separator)) {
-			path += File.separator;
-		}
-		path += URLString.substring(URLString.lastIndexOf('/') + 1);
-		File file = new File(path);
-		
-		if (file.exists()) {
-			if (mConfigFile.getDefaultFileExistsBehavior().equals(DefaultFileExistsBehavior.REPLACE)) {
-				file.delete();
-			}
-			if (mConfigFile.getDefaultFileExistsBehavior().equals(DefaultFileExistsBehavior.RENAME)) {
-				int i = 1;
-				int pos = path.lastIndexOf(".");
-				if (pos == -1) {
-					pos = path.length();
-				}
-
-				String newPath;
-
-				do {
-					newPath = path.substring(0, pos) + "(" + i + ")" + path.substring(pos);
-					file = new File(newPath);
-					i++;
-				} while (file.exists());
-
-				downloadObject.setPath(newPath);
-			}
-		}
-
 		return downloadObject;
+	}
+
+	/**
+	 * Create a new download object.
+	 * @param URLString The url at which the download is located.
+	 * @param path The full path (directory+filename+extension) to download to.
+	 * @return The download object that was added.
+	 * @throws MalformedURLException if the URL is not a valid URL.
+	 */
+	public DownloadObject createDownloadObjectWithPath(String URLString, String path) throws MalformedURLException {
+		URL verifiedURL = verifyUrl(URLString);
+		DownloadObject downloadObject = new DownloadObject(new HTTPDownloadConnection(verifiedURL));
+		downloadObject.setPath(path);
+		return downloadObject;
+	}
+
+	/**
+	 * Save downloads file.
+	 * Synchronized to avoid potential file write errors across multiple threads.
+	 */
+	private synchronized void saveDownloadsFile() {
+		try {
+			ArrayList<DownloadObject> allDownloads = new ArrayList<DownloadObject>();
+			allDownloads.addAll(mActiveList);
+			allDownloads.addAll(mInactiveList);
+			allDownloads.addAll(mPendingList);
+			allDownloads.addAll(mCompletedList);
+			allDownloads.addAll(mErrorList);
+
+			new XMLDownloadsFile(allDownloads).saveFile();
+		} catch (Exception e) {
+			DownloadLogger.LOGGER.severe(e.toString());
+		}
 	}
 
 	/**
@@ -303,12 +317,16 @@ public class DownloadManager implements DownloadObserver {
 		updatePendingList();
 	}
 
+	public void downloadEventPerformed(DownloadConnectedEvent downloadConnectedEvent) {
+		saveDownloadsFile();
+	}
+
 	/**
 	 * Check if there are pending downloads and if so move the top one up to the active list.
 	 */
 	private void updatePendingList() {
 		// if an active download has stopped downloading, activate top pending download.
-		if (mPendingList.size() > 0 && mActiveList.size() < mConfigFile.getMaxDownloads()) {
+		while (mPendingList.size() > 0 && mActiveList.size() < mConfigFile.getMaxDownloads()) {
 			DownloadObject pending = mPendingList.get(0);
 			pending.changeStatusState(new ActiveState(pending));
 		}
@@ -425,5 +443,6 @@ public class DownloadManager implements DownloadObserver {
 	 */
 	public void removeDownload(DownloadObject downloadObject) {
 		mURLs.remove(downloadObject.getConnection().getURL());
+		saveDownloadsFile();
 	}
 }

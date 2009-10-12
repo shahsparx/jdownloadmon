@@ -1,19 +1,10 @@
 package jdownloadmon;
 
-import java.io.File;
 import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import javax.xml.xpath.XPath;
@@ -24,7 +15,7 @@ import org.xml.sax.SAXException;
  * Class used for loading and saving xml config files.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
-public class XMLConfigFile {
+public class XMLConfigFile extends XMLFile {
 
 	/** Location of the xml file. */
 	private static final String LOCATION = "config.xml";
@@ -63,6 +54,7 @@ public class XMLConfigFile {
 	 * @param defaultFileExistsBehavior The setting for default file exists behavior.
 	 */
 	public XMLConfigFile(String defaultDirectory, int maxDownloads, DownloadManager.DefaultFileExistsBehavior defaultFileExistsBehavior) {
+		super(LOCATION);
 		mDefaultDirectory = defaultDirectory;
 		mMaxDownloads = maxDownloads;
 		mDefaultFileExistsBehavior = defaultFileExistsBehavior;
@@ -77,22 +69,17 @@ public class XMLConfigFile {
 	 * @throws XPathExpressionException If the xml file did not contain the right elements.
 	 */
 	public static XMLConfigFile loadFile() throws ParserConfigurationException, SAXException, XPathExpressionException, IOException {
-		File file = new File(LOCATION);
-		if (!file.exists()) {
+		Document doc = getFile(LOCATION);
+		if (doc == null) {
 			return null;
 		}
 
-		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = domFactory.newDocumentBuilder();
-		Document doc = builder.parse(file);
-		
-		XPathFactory xPathFactory = XPathFactory.newInstance();
-	    XPath xpath = xPathFactory.newXPath();
-		
-		Node defaultDirectory = (Node)			xpath.compile("/config/defaultDirectory").evaluate(doc, XPathConstants.NODE);
-		Node maxDownloads = (Node)				xpath.compile("/config/maxDownloads").evaluate(doc, XPathConstants.NODE);
-		Node defaultFileExistsBehavior = (Node)	xpath.compile("/config/defaultFileExistsBehavior").evaluate(doc, XPathConstants.NODE);
-		
+		XPath xpath = getXPath();
+
+		Node defaultDirectory = (Node) xpath.compile("/config/defaultDirectory").evaluate(doc, XPathConstants.NODE);
+		Node maxDownloads = (Node) xpath.compile("/config/maxDownloads").evaluate(doc, XPathConstants.NODE);
+		Node defaultFileExistsBehavior = (Node) xpath.compile("/config/defaultFileExistsBehavior").evaluate(doc, XPathConstants.NODE);
+
 		String directory = defaultDirectory.getTextContent().trim();
 		int downloads = Integer.parseInt(maxDownloads.getTextContent().trim());
 		DownloadManager.DefaultFileExistsBehavior fileExists = DownloadManager.DefaultFileExistsBehavior.valueOf(
@@ -110,10 +97,8 @@ public class XMLConfigFile {
 	public void saveFile()
 			throws ParserConfigurationException, TransformerConfigurationException, TransformerException {
 
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		Document doc = docBuilder.newDocument();
-		
+		Document doc = getFreshDocument();
+
 		Node configNode = doc.createElement("config");
 		doc.appendChild(configNode);
 
@@ -129,11 +114,6 @@ public class XMLConfigFile {
 		defaultFileExistsBehaviorNode.setTextContent(mDefaultFileExistsBehavior.toString());
 		configNode.appendChild(defaultFileExistsBehaviorNode);
 
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-		StreamResult result = new StreamResult(new File(LOCATION));
-		DOMSource source = new DOMSource(doc);
-		transformer.transform(source, result);
+		saveDocument(doc);
 	}
 }

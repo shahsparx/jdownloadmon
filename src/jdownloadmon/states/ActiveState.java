@@ -1,9 +1,10 @@
 package jdownloadmon.states;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadManager;
+import jdownloadmon.DownloadObject;
 
 /**
- * An active state is a downloading state.
+ * The active state represents the status of a download object in the process of downloading.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class ActiveState extends StatusState {
@@ -19,7 +20,6 @@ public class ActiveState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromActiveList(mDownloadObject);
-		mDownloadObject = null;
 	}
 
 	@Override

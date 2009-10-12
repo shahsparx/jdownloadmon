@@ -1,6 +1,6 @@
 package jdownloadmon.gui.renderers;
 
-import jdownloadmon.gui.viewStates.*;
+import jdownloadmon.gui.viewStates.ViewState;
 import java.awt.Component;
 import javax.swing.JTable;
 

@@ -1,14 +1,15 @@
 package jdownloadmon.states;
 
-import jdownloadmon.*;
 import jdownloadmon.events.DownloadStatusStateEvent;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import jdownloadmon.DownloadLogger;
+import jdownloadmon.DownloadObject;
 
 /**
- * A StatusState is a state which a {@link DownloadObject} uses to perform certain state-based actions.
+ * A StatusState is a state in which a {@link DownloadObject} can be and helps to perform some status specific actions.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public abstract class StatusState {
@@ -65,11 +66,11 @@ public abstract class StatusState {
 	 * @param state The status state to change to.
 	 */
 	public void changeTo(StatusState state) {
-		StatusState oldState = mDownloadObject.getStatusState();
-		if (mDownloadObject != null && state.changeTo()) {
+		if (state.changeTo()) {
+			changeFrom();
 			DownloadStatusStateEvent event = new DownloadStatusStateEvent(mDownloadObject);
 			mDownloadObject.notifyListeners(event);
-			oldState.changeFrom();
+			mDownloadObject = null;
 		}
 	}
 
