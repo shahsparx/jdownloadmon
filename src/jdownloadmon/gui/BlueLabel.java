@@ -17,7 +17,6 @@ public class BlueLabel extends JLabel {
 	public BlueLabel(String text) {
 		super(text);
 		setForeground(Color.BLUE);
-		setBorder(new EmptyBorder(2,2,2,2));
+		setBorder(new EmptyBorder(2, 2, 2, 2));
 	}
-
 }

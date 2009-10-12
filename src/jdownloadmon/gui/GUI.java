@@ -1,7 +1,7 @@
 package jdownloadmon.gui;
 
-
-
+import java.util.logging.Level;
+import jdownloadmon.events.DownloadConnectedEvent;
 import jdownloadmon.gui.buttons.SettingsButton;
 import jdownloadmon.gui.buttons.AboutButton;
 import jdownloadmon.gui.buttons.NewDownloadButton;
@@ -13,15 +13,17 @@ import jdownloadmon.events.DownloadStatusStateEvent;
 import jdownloadmon.gui.renderers.ViewStateRenderer;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import jdownloadmon.DownloadLogger;
 import jdownloadmon.DownloadManager;
+import jdownloadmon.XMLDownloadsFile;
 
 /**
  * The GUI for the Download Manager.
@@ -44,8 +46,10 @@ public class GUI implements DownloadObserver {
 	private JButton mMoveUpQueueButton;
 	/** The button used to move selected downloads down the list. */
 	private JButton mMoveDownQueueButton;
-	/** All the buttons. */
+	/** All the buttons in the gui that are used to perform download operations. */
 	private ArrayList<JButton> mButtons;
+	/** The frame used. */
+	private JFrame mFrame;
 
 	/**
 	 * Private constructor for GUI.
@@ -60,6 +64,20 @@ public class GUI implements DownloadObserver {
 		mButtons.add(mRemoveButton = new JButton(IconStore.INSTANCE.getImageIcon("remove.png")));
 		mButtons.add(mMoveUpQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("up.png")));
 		mButtons.add(mMoveDownQueueButton = new JButton(IconStore.INSTANCE.getImageIcon("down.png")));
+	}
+
+	/**
+	 * Set the cursor to the hourglass cursor.
+	 */
+	public void setThinkingCursor() {
+		mFrame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+	}
+
+	/**
+	 * Set the cursor to the default cursor.
+	 */
+	public void setDefaultCursor() {
+		mFrame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	/**
@@ -78,7 +96,7 @@ public class GUI implements DownloadObserver {
 
 		JPanel topButtonsPanel = new JPanel(new FlowLayout());
 		JButton newDownloadButton = new JButton(IconStore.INSTANCE.getImageIcon("add.png"));
-		
+
 		new NewDownloadButton(newDownloadButton);
 		topButtonsPanel.add(newDownloadButton);
 		topButtonsPanel.add(mStartButton);
@@ -102,16 +120,38 @@ public class GUI implements DownloadObserver {
 		pane.setPreferredSize(new Dimension(600, 400));
 		middlePanel.add(pane);
 
-		DownloadFrame frame = new DownloadFrame("jDownloadMon");
-		Container content = frame.getContentPane();
+		mFrame = new DownloadFrame("jDownloadMon");
+		Container content = mFrame.getContentPane();
 
 		content.add(topButtonsPanel, BorderLayout.NORTH);
 		content.add(middlePanel, BorderLayout.CENTER);
 		content.add(bottomButtonsPanel, BorderLayout.SOUTH);
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
+		mFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mFrame.setResizable(false);
+		mFrame.pack();
+		mFrame.setVisible(true);
+
+		setThinkingCursor();
+		try {
+			XMLDownloadsFile downloadsFile = XMLDownloadsFile.loadFile();
+			if (downloadsFile == null) {
+				downloadsFile = new XMLDownloadsFile(new ArrayList<DownloadObject>());
+				downloadsFile.saveFile();
+			} else {
+				for (DownloadObject object : downloadsFile.getDownloads()) {
+					DownloadManager.INSTANCE.addDownload(object);
+					addDownloadObject(object);
+					// make sure the listeners know how many percent are downloaded.
+					object.notifyListeners(new DownloadProgressEvent(object));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			DownloadLogger.LOGGER.log(Level.SEVERE, e.toString());
+		}
+
+		setDefaultCursor();
 	}
 
 	/**
@@ -166,5 +206,9 @@ public class GUI implements DownloadObserver {
 
 	public void downloadEventPerformed(DownloadStatusStateEvent downloadStatusStateEvent) {
 		mQueue.update(downloadStatusStateEvent);
+	}
+
+	public void downloadEventPerformed(DownloadConnectedEvent downloadConnectedEvent) {
+		mQueue.update(downloadConnectedEvent);
 	}
 }

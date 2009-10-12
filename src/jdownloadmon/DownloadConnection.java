@@ -63,7 +63,7 @@ public abstract class DownloadConnection {
 	 * @throws IOException if the connection was unsuccessful.
 	 */
 	public abstract long connect(long downloadedSize) throws IOException;
-	
+
 	/**
 	 * Get the full size of the download.
 	 * @return The full size of the download in bytes.

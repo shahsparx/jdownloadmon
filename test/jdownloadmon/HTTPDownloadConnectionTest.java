@@ -18,7 +18,7 @@ public class HTTPDownloadConnectionTest {
 	 * Test of getBytes method, of class HTTPDownloadConnection.
 	 * Downloads a file and tests its Adler32 checksum against a (hopefully) identical existing file.
 	 *
-	 * @throws Exception if there was an error reading, writing or deleting files.
+	 * @throws Exception if there was an error reading or writing files.
 	 */
 	@Test
 	public void testGetBytes() throws Exception {

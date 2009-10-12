@@ -1,6 +1,6 @@
 package jdownloadmon.gui.buttons;
 
-import jdownloadmon.gui.*;
+import jdownloadmon.gui.DownloadFrame;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
@@ -22,11 +22,11 @@ public abstract class FrameButton extends Button {
 		super(button);
 		mFrame = new DownloadFrame(title);
 		mFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		mFrame.setResizable(false);
 	}
 
 	@Override
 	public void push() {
 		mFrame.setVisible(true);
 	}
-
 }

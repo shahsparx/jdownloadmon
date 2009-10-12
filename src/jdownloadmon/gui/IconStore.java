@@ -5,7 +5,7 @@ import java.util.HashMap;
 import javax.swing.ImageIcon;
 
 /**
- * An icon store for managing icons and while saving memory usage.
+ * An icon store for managing icons while saving memory usage.
  * [singleton]
  * @author Edward Larsson (edward.larsson@gmx.com)
  */

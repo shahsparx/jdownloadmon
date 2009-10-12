@@ -1,9 +1,10 @@
 package jdownloadmon.states;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadManager;
+import jdownloadmon.DownloadObject;
 
 /**
- * An inactive state is a paused or stopped state.
+ * The inactive state represents the status of a download object not doing anything.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class InactiveState extends StatusState {
@@ -24,14 +25,13 @@ public class InactiveState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromInactiveList(mDownloadObject);
-		mDownloadObject = null;
 	}
 
 	@Override
 	public boolean changeTo() {
 		if (DownloadManager.INSTANCE.addToInactiveList(mDownloadObject)) {
-		mDownloadObject.setStatusState(this);
-		return true;
+			mDownloadObject.setStatusState(this);
+			return true;
 		}
 
 		return false;

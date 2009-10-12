@@ -12,6 +12,8 @@ public class DownloadFile {
 
 	/** The random access file this file handler uses. */
 	private RandomAccessFile mFile;
+	/** The random acess file's destination.*/
+	private String mDestination;
 
 	/**
 	 * Construct a download file.
@@ -20,12 +22,43 @@ public class DownloadFile {
 	 * @throws IOException if position is less than 0 or an I/O error occurs.
 	 */
 	public DownloadFile(String destination, long position) throws IOException {
-		File f = new File(destination);
-		File dir = f.getParentFile();
+		mDestination = destination;
+
+		File file = new File(mDestination);
+
+		if (file.exists()) {
+			if (DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior().equals(
+					DownloadManager.DefaultFileExistsBehavior.REPLACE)) {
+				file.delete();
+			}
+			if (DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior().equals(
+					DownloadManager.DefaultFileExistsBehavior.RENAME)) {
+				// For a new file, reset the position to 0
+				position = 0;
+				int i = 1;
+				int pos = mDestination.lastIndexOf(".");
+				if (pos == -1) {
+					pos = mDestination.length();
+				}
+
+				String newPath;
+
+				do {
+					newPath = mDestination.substring(0, pos) + "(" + i + ")" + mDestination.substring(pos);
+					file = new File(newPath);
+					i++;
+				} while (file.exists());
+
+				mDestination = newPath;
+			}
+		}
+
+		File dir = file.getParentFile();
 		if (dir != null && !dir.isDirectory()) {
 			dir.mkdir();
 		}
-		mFile = new RandomAccessFile(destination, "rw");
+
+		mFile = new RandomAccessFile(mDestination, "rw");
 		mFile.seek(position);
 	}
 
@@ -41,6 +74,13 @@ public class DownloadFile {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * @return The destination of this file.
+	 */
+	public String getDestination() {
+		return mDestination;
 	}
 
 	/**

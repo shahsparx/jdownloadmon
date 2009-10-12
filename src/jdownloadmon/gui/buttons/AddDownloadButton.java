@@ -1,6 +1,5 @@
 package jdownloadmon.gui.buttons;
 
-import jdownloadmon.gui.*;
 import jdownloadmon.DownloadManager;
 import jdownloadmon.DownloadObject;
 import java.awt.BorderLayout;
@@ -10,6 +9,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import jdownloadmon.URLAlreadyExistsException;
+import jdownloadmon.gui.AddDownloadBox;
+import jdownloadmon.gui.DownloadFrame;
+import jdownloadmon.gui.GUI;
 
 /**
  * The add download button is the button in the add download dialog box and is for
@@ -35,12 +37,12 @@ public class AddDownloadButton extends Button {
 	public AddDownloadButton(JButton button, AddDownloadBox addDownloadBox, DownloadFrame frame) {
 		super(button);
 		button.setToolTipText("add");
-		
+
 		mAddDownloadBox = addDownloadBox;
 		mFrame = frame;
 		mAddDownloadBox.getURLTextField().addActionListener(this);
 		mErrorLabel = new JLabel(" ");
-		mErrorLabel.setBorder(new EmptyBorder(5,5,5,5));
+		mErrorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		mErrorLabel.setForeground(Color.red);
 		mFrame.getContentPane().add(mErrorLabel, BorderLayout.SOUTH);
 		mFrame.pack();

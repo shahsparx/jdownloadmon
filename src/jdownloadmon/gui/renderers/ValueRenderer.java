@@ -1,5 +1,7 @@
 package jdownloadmon.gui.renderers;
 
+import javax.swing.SwingConstants;
+
 /**
  * A value renderer, used for rendering a long, and has a getter and a setter for that long.
  * @author Edward Larsson (edward.larsson@gmx.com)
@@ -16,6 +18,7 @@ public class ValueRenderer extends TextRenderer {
 	 */
 	public ValueRenderer(String text, long value) {
 		super(text);
+		setHorizontalAlignment(SwingConstants.RIGHT);
 		mValue = value;
 	}
 

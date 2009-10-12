@@ -1,9 +1,10 @@
 package jdownloadmon.states;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadManager;
+import jdownloadmon.DownloadObject;
 
 /**
- * A pending state is a "waiting to be active" state.
+ * The pending state represents the status of a download object waiting to download.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class PendingState extends StatusState {
@@ -24,14 +25,13 @@ public class PendingState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromPendingList(mDownloadObject);
-		mDownloadObject = null;
 	}
 
 	@Override
 	public boolean changeTo() {
 		if (DownloadManager.INSTANCE.addToPendingList(mDownloadObject)) {
-		mDownloadObject.setStatusState(this);
-		return true;
+			mDownloadObject.setStatusState(this);
+			return true;
 		}
 
 		return false;

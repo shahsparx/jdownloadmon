@@ -13,10 +13,9 @@ public class QueueComparator<T extends DownloadView> implements Comparator<T> {
 	 * Compare two Download Views.
 	 * @param firstView The first download view to compare.
 	 * @param secondView The second download view to compare.
-	 * @return A negative integer, 0 or a positive integer depending on whehter firstView is less, equal to or greater than secondView.
+	 * @return A negative integer, 0 or a positive integer depending on whether firstView is less, equal to or greater than secondView.
 	 */
 	public int compare(T firstView, T secondView) {
-		return firstView.getQueuePosition()- secondView.getQueuePosition();
+		return firstView.getQueuePosition() - secondView.getQueuePosition();
 	}
-
 }

@@ -19,7 +19,7 @@ public class DownloadLogger {
 
 	static {
 		try {
-			boolean append = false;
+			boolean append = Constants.RELEASE;
 			FileHandler fh = new FileHandler(LOGGER_NAME + ".log", append);
 			//fh.setFormatter(new XMLFormatter());
 			fh.setFormatter(new SimpleFormatter());

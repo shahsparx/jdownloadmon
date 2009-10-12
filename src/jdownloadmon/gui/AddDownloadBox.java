@@ -1,10 +1,8 @@
 package jdownloadmon.gui;
 
 import jdownloadmon.DownloadManager;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.text.DefaultEditorKit;
+import jdownloadmon.Constants;
 
 /**
  * The add download dialog box is used for adding a new download to the download manager.
@@ -27,20 +25,10 @@ public class AddDownloadBox {
 		mDirectoryTextField = directoryTextField;
 		mDirectoryTextField.setText(DownloadManager.INSTANCE.getDefaultDirectory());
 		mDirectoryTextField.setToolTipText("Directory Textfield");
-		mURLTextField.setText("http://googleisagiantrobot.com/google-is-a-giant-robot.png");
 		mURLTextField.setToolTipText("URL Textfield");
-		JPopupMenu popup = new JPopupMenu();
-		JMenuItem item = new JMenuItem(new DefaultEditorKit.CutAction());
-		item.setText("Cut");
-		popup.add(item);
-		item = new JMenuItem(new DefaultEditorKit.CopyAction());
-		item.setText("Copy");
-		popup.add(item);
-		item = new JMenuItem(new DefaultEditorKit.PasteAction());
-		item.setText("Paste");
-		popup.add(item);
-		mURLTextField.setComponentPopupMenu(popup);
-		mDirectoryTextField.setComponentPopupMenu(popup);
+		if (!Constants.RELEASE) {
+			mURLTextField.setText("http://googleisagiantrobot.com/google-is-a-giant-robot.png");
+		}
 	}
 
 	/**

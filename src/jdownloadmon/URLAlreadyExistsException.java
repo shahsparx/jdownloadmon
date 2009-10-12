@@ -20,5 +20,4 @@ public class URLAlreadyExistsException extends Exception {
 	public URLAlreadyExistsException(String message) {
 		super(message);
 	}
-
 }

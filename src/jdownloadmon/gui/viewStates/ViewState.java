@@ -1,6 +1,6 @@
 package jdownloadmon.gui.viewStates;
 
-import jdownloadmon.gui.*;
+import jdownloadmon.gui.IconStore;
 import javax.swing.ImageIcon;
 
 /**

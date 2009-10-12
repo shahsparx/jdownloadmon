@@ -1,23 +1,24 @@
 package jdownloadmon.gui.buttons;
 
 import java.awt.Dimension;
-import jdownloadmon.gui.*;
+
 import java.awt.FlowLayout;
 import java.awt.Font;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import jdownloadmon.gui.BlueLabel;
+import jdownloadmon.gui.IconStore;
 
 /**
- * Wrapping the behavior of the about menu item that creates an About frame.
+ * Wrapping the behavior of the about button that creates an about frame.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class AboutButton extends FrameButton {
 
 	/**
-	 * Construct an about menu button.
+	 * Construct an about button.
 	 * @param button The JButton wrapped.
 	 */
 	public AboutButton(JButton button) {
@@ -37,14 +38,13 @@ public class AboutButton extends FrameButton {
 		titleLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
 		JLabel progInfo = new BlueLabel("<html><center>" +
-				"A simple download manager that currently only supports http links." +
+				"A simple download manager that currently only supports plain http links." +
 				"</center></html>");
-		// 30 characters for html tags, 38 is current length of the rightPanel
 		int fontHeight = progInfo.getFontMetrics(progInfo.getFont()).getHeight();
-		int height = (progInfo.getText().length() - 30)  / 38 * fontHeight + fontHeight;
-		progInfo.setPreferredSize(new Dimension(0,height));
+		// 30 characters for html tags, 38 is current number of characters that fit on one line.
+		int height = (progInfo.getText().length() - 30) / 38 * fontHeight + fontHeight;
+		progInfo.setPreferredSize(new Dimension(0, height));
 		progInfo.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-		progInfo.setHorizontalAlignment(SwingConstants.CENTER);
 
 		JPanel tablePanel = new JPanel(new FlowLayout());
 		JPanel descriptorPanel = new JPanel();

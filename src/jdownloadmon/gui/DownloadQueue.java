@@ -1,6 +1,7 @@
 package jdownloadmon.gui;
 
 import jdownloadmon.DownloadManager;
+import jdownloadmon.events.DownloadConnectedEvent;
 import jdownloadmon.gui.viewStates.CompletedViewState;
 import jdownloadmon.gui.viewStates.ErrorViewState;
 import jdownloadmon.gui.viewStates.ActiveViewState;
@@ -26,7 +27,9 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
+import jdownloadmon.gui.renderers.ValueRenderer;
 
 /**
  * A download queue for the gui to show the list of download objects.
@@ -37,8 +40,9 @@ public class DownloadQueue extends JTable implements ActionListener {
 	/** The list of download views. */
 	private HashMap<DownloadObject, DownloadView> mDownloadViews;
 	/** The table model for this table */
-	DownloadTableModel mTableModel;
-
+	private DownloadTableModel mTableModel;
+	/** Boolean value representing whether the selection is currently being adjusted. */
+	private boolean mIsAdjusting;
 
 	/**
 	 * Construct a download queue.
@@ -54,12 +58,12 @@ public class DownloadQueue extends JTable implements ActionListener {
 
 		// Make the columns renderable.
 		TableColumn position = columnModel.getColumn(columnModel.getColumnIndex("#"));
-		position.setCellRenderer(new TextRenderer(null));
+		position.setCellRenderer(new ValueRenderer(null, 0));
 		position.setMaxWidth(25);
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Filename.toString())).setCellRenderer(new TextRenderer(null));
-		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Size.toString())).setCellRenderer(new TextRenderer(null));
-		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.ETA.toString())).setCellRenderer(new TextRenderer(null));
-		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Speed.toString())).setCellRenderer(new TextRenderer(null));
+		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Size.toString())).setCellRenderer(new ValueRenderer(null, 0));
+		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.ETA.toString())).setCellRenderer(new ValueRenderer(null, 0));
+		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Speed.toString())).setCellRenderer(new ValueRenderer(null, 0));
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Status.toString())).setCellRenderer(new ViewStateRenderer(null));
 		columnModel.getColumn(columnModel.getColumnIndex(DownloadTableModel.Columns.Progress.toString())).setCellRenderer(new ProgressBarRenderer());
 
@@ -76,18 +80,24 @@ public class DownloadQueue extends JTable implements ActionListener {
 		});
 	}
 
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		super.valueChanged(e);
+		mIsAdjusting = e.getValueIsAdjusting();
+	}
 	/**
 	 * Sort the table whilst keeping the selections.
 	 * Synchronized to keep the selection intact if multiple threads try to access the selected rows at the same time.
 	 */
 	public synchronized void sort() {
-		if (mTableModel.isSorting()) {
+		if (mTableModel.isSorting() &! mIsAdjusting) {
+			GUI.INSTANCE.setThinkingCursor();
 			DownloadView[] views = getSelectedViews();
 			mTableModel.sortRows();
 			mTableModel.fireTableDataChanged();
 			selectViews(views);
+			GUI.INSTANCE.setDefaultCursor();
 		}
-			
 	}
 
 	/**
@@ -121,6 +131,17 @@ public class DownloadQueue extends JTable implements ActionListener {
 	}
 
 	/**
+	 * A download object has connected, so update view with filesize and filename.
+	 * @param downloadConnectedEvent The download connection event that was raised.
+	 */
+	public void update(DownloadConnectedEvent downloadConnectedEvent) {
+		DownloadView view = mDownloadViews.get(downloadConnectedEvent.getDownloadObject());
+		view.updateSize();
+		view.updateFileName();
+		this.repaint();
+	}
+
+	/**
 	 * Update a download with the specified download event.
 	 * @param downloadStatusStateEvent The download event that was performed.
 	 */
@@ -143,7 +164,6 @@ public class DownloadQueue extends JTable implements ActionListener {
 		// Update ETA and speed after the download gets inactivated too otherwise the eta and speed will remain.
 		view.updateETA();
 		view.updateSpeed();
-		view.updateSize();
 		view.updateQueuePosition();
 		updateQueueingPositions();
 		this.repaint();
@@ -183,7 +203,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 	 * @param views Which views to select.
 	 */
 	public void selectViews(DownloadView[] views) {
-		for (DownloadView view:  views) {
+		for (DownloadView view : views) {
 			int row = mTableModel.getRowForView(view);
 			this.addRowSelectionInterval(row, row);
 		}
@@ -204,13 +224,13 @@ public class DownloadQueue extends JTable implements ActionListener {
 	 * @param e The action event with info about which button was pushed, among others.
 	 */
 	public void actionPerformed(ActionEvent e) {
+		GUI.INSTANCE.setThinkingCursor();
+
 		DownloadView[] views = getSelectedViews();
 		Object source = e.getSource();
 		if (source.equals(GUI.INSTANCE.getStartButton())) {
 			for (DownloadView view : views) {
 				view.getDownloadObject().download();
-				view.getDownloadObject().updateSizes();
-				view.updateSize();
 			}
 		} else if (source.equals(GUI.INSTANCE.getStopButton())) {
 			for (DownloadView view : views) {
@@ -226,11 +246,11 @@ public class DownloadQueue extends JTable implements ActionListener {
 				DownloadManager.INSTANCE.removeDownload(downloadObject);
 				mTableModel.removeDownloadView(row);
 			}
-		/*
-		 * The following two loops for moving downloads up and down the queue make sure that
-		 * when multiple downloads are selected they move in sync. For example:
-		 * If 1, 2 and 3 are selected and the user tries to move them up the queue nothing happens.
-		 */
+			/*
+			 * The following two loops for moving downloads up and down the queue make sure that
+			 * when multiple downloads are selected they move in sync. For example:
+			 * If 1, 2 and 3 are selected and the user tries to move them up the queue nothing happens.
+			 */
 		} else if (source.equals(GUI.INSTANCE.getMoveUpQueueButton())) {
 			int previousPos = 0;
 			Arrays.sort(views, new QueueComparator<DownloadView>());
@@ -249,10 +269,10 @@ public class DownloadQueue extends JTable implements ActionListener {
 				}
 			}
 			updateQueueingPositions();
-		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {			
-			int previousPos = DownloadManager.INSTANCE.getNumberOfQueuedDownloads()+1;
+		} else if (source.equals(GUI.INSTANCE.getMoveDownQueueButton())) {
+			int previousPos = DownloadManager.INSTANCE.getNumberOfQueuedDownloads() + 1;
 			Arrays.sort(views, new QueueComparator<DownloadView>());
-			for (int i = views.length-1; i >= 0; i--) {
+			for (int i = views.length - 1; i >= 0; i--) {
 				DownloadView view = views[i];
 				if (view.getQueuePosition() != Integer.MAX_VALUE) {
 					previousPos--;
@@ -269,5 +289,6 @@ public class DownloadQueue extends JTable implements ActionListener {
 			}
 			updateQueueingPositions();
 		}
+		GUI.INSTANCE.setDefaultCursor();
 	}
 }

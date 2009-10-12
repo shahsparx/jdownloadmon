@@ -39,8 +39,7 @@ public class DownloadFrame extends JFrame {
 		super.pack();
 		// Place the frame in the middle of the screen.
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation((int)dim.getWidth()/2-getWidth()/2,
-				(int)dim.getHeight()/2 - getHeight()/2);
+		setLocation((int) dim.getWidth() / 2 - getWidth() / 2,
+				(int) dim.getHeight() / 2 - getHeight() / 2);
 	}
-
 }

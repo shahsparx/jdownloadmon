@@ -1,7 +1,7 @@
 package jdownloadmon.events;
 
+import jdownloadmon.DownloadObject;
 import jdownloadmon.states.StatusState;
-import jdownloadmon.*;
 
 /**
  * A download progress event contains information about the status state of a {@link DownloadObject}.

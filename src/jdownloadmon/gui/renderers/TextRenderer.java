@@ -9,7 +9,7 @@ import javax.swing.SwingConstants;
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class TextRenderer extends DownloadRenderer {
-	
+
 	/** The text displayed using this renderer. */
 	private String mText;
 
@@ -19,7 +19,6 @@ public class TextRenderer extends DownloadRenderer {
 	 */
 	public TextRenderer(String text) {
 		mText = text;
-		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
 	/**

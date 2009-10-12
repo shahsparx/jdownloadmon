@@ -1,5 +1,6 @@
 package jdownloadmon;
 
+import jdownloadmon.events.DownloadConnectedEvent;
 import jdownloadmon.events.DownloadStatusStateEvent;
 import jdownloadmon.events.DownloadProgressEvent;
 
@@ -32,4 +33,10 @@ public interface DownloadObservable {
 	 * @param downloadStatusStateEvent The download event that was raised.
 	 */
 	public void notifyListeners(DownloadStatusStateEvent downloadStatusStateEvent);
+
+	/**
+	 * Notify all the listeners of an event.
+	 * @param downloadConnectedEvent The download event that was raised.
+	 */
+	public void notifyListeners(DownloadConnectedEvent downloadConnectedEvent);
 }

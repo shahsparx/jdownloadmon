@@ -1,9 +1,10 @@
 package jdownloadmon.states;
 
-import jdownloadmon.*;
+import jdownloadmon.DownloadManager;
+import jdownloadmon.DownloadObject;
 
 /**
- * An error state indicates an error and has an error message to describe the error.
+ * The error state represents the status of a download object when it has failed to download.
  * @author Edward Larsson (edward.larsson@gmx.com)
  */
 public class ErrorState extends StatusState {
@@ -36,14 +37,13 @@ public class ErrorState extends StatusState {
 	@Override
 	public void changeFrom() {
 		DownloadManager.INSTANCE.removeFromErrorList(mDownloadObject);
-		mDownloadObject = null;
 	}
 
 	@Override
 	public boolean changeTo() {
 		if (DownloadManager.INSTANCE.addToErrorList(mDownloadObject)) {
-		mDownloadObject.setStatusState(this);
-		return true;
+			mDownloadObject.setStatusState(this);
+			return true;
 		}
 
 		return false;

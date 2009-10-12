@@ -64,9 +64,9 @@ public class DownloadTableModel extends DefaultTableModel {
 	@Override
 	public String getColumnName(int column) {
 		String columnName = "";
-		
+
 		if (column == 0) {
-				columnName += "#";
+			columnName += "#";
 		} else {
 			columnName += Columns.values()[column].toString();
 		}
@@ -146,7 +146,7 @@ public class DownloadTableModel extends DefaultTableModel {
 	 * @return The download view that's in that row.
 	 */
 	public DownloadView getViewAt(int row) {
-		return mViews.get((Vector)mRows.get(row));
+		return mViews.get((Vector) mRows.get(row));
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class DownloadTableModel extends DefaultTableModel {
 			if (getViewAt(i) == view) {
 				return i;
 			}
-		} 
+		}
 
 		return -1;
 	}
@@ -191,7 +191,7 @@ public class DownloadTableModel extends DefaultTableModel {
 				if (!mIsSortAsc) {
 					mSortColumn = -1;
 				}
-				
+
 				mIsSortAsc = !mIsSortAsc;
 			} else {
 				mSortColumn = modelIndex;

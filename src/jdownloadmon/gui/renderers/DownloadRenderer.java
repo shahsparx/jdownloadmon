@@ -38,6 +38,6 @@ public abstract class DownloadRenderer extends DefaultTableCellRenderer implemen
 	public abstract String toString();
 
 	public int compareTo(DownloadRenderer o) {
-		return toString().compareTo(o.toString());
+		return toString().compareToIgnoreCase(o.toString());
 	}
 }
