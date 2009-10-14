@@ -125,6 +125,9 @@ public class DownloadObject implements Runnable, DownloadObservable {
 					}
 
 					notifyListeners(new DownloadProgressEvent(DownloadObject.this));
+
+					mSpeed = 0;
+					mETA = 0;
 				}
 			};
 			// Schedule above task for every (UPDATE_INTERVAL_MILLISECONDS) milliseconds.
@@ -153,8 +156,6 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		} finally {
 			// stop updating the download.
 			timer.cancel();
-			mSpeed = 0;
-			mETA = 0;
 			// close the file and connection.
 			if (mDownloadFile != null) {
 				mDownloadFile.close();
