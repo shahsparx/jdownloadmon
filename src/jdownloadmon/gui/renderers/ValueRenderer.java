@@ -40,7 +40,14 @@ public class ValueRenderer extends TextRenderer {
 	@Override
 	public int compareTo(DownloadRenderer o) {
 		if (o instanceof ValueRenderer) {
-			return (int) (mValue - ((ValueRenderer) o).mValue);
+			long result =  (mValue - ((ValueRenderer) o).mValue);
+			if (result > 0) {
+				return + 1;
+			} else if (result < 0) {
+				return -1;
+			} else {
+				return 0;
+			}
 		}
 
 		return super.compareTo(o);
