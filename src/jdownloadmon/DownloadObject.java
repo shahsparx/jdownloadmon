@@ -135,8 +135,6 @@ public class DownloadObject implements Runnable, DownloadObservable {
 				mDownloadFile.write(bytes);
 				mDownloadedSize += bytes.length;
 			}
-			mSpeed = 0;
-			mETA = 0;
 			// Notify listeners about 100% progress.
 			notifyListeners(new DownloadProgressEvent(this));
 		} catch (NullPointerException ex) {
@@ -155,6 +153,8 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		} finally {
 			// stop updating the download.
 			timer.cancel();
+			mSpeed = 0;
+			mETA = 0;
 			// close the file and connection.
 			if (mDownloadFile != null) {
 				mDownloadFile.close();
