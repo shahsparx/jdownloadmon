@@ -112,14 +112,10 @@ public class HTTPDownloadConnection extends DownloadConnection {
 	@Override
 	public void close() {
 		try {
-			if (mStream != null) {
-				mStream.close();
-			}
-			if (mRequest != null) {
-				mRequest.releaseConnection();
-			}
-		} catch (Exception e) {
-			//ignore
+			mRequest.abort();
+			mStream.close();
+		} catch (Exception ex) {
+			// ignore
 		}
 	}
 

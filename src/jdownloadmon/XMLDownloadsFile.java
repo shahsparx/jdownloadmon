@@ -1,6 +1,5 @@
 package jdownloadmon;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.w3c.dom.Document;

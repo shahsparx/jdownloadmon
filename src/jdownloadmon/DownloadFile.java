@@ -29,6 +29,8 @@ public class DownloadFile {
 		if (file.exists()) {
 			if (DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior().equals(
 					DownloadManager.DefaultFileExistsBehavior.REPLACE)) {
+				// For a new file, reset the position to 0
+				position = 0;
 				file.delete();
 			}
 			if (DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior().equals(
