@@ -265,8 +265,9 @@ public class DownloadObject implements Runnable, DownloadObservable {
 		pause();
 		mStatusState.remove();
 		if (mDownloadFile != null && (mDownloadedSize == 0 || mDownloadedSize < mSize)) {
-			new File(mDestination).delete();
+			mDownloadFile.close();
 			mDownloadFile = null;
+			new File(mDestination).delete();
 		}
 	}
 
