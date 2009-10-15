@@ -20,6 +20,7 @@ public class DownloadFile {
 	 * Construct a download file.
 	 * @param destination The url the file is located at.
 	 * @param position The position at which to start writing to local file.
+	 * @param behavior The behacior to use if the file exists.
 	 * @throws IOException if position is less than 0 or an I/O error occurs.
 	 */
 	public DownloadFile(String destination, long position, DefaultFileExistsBehavior behavior) throws IOException {

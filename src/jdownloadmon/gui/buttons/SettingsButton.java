@@ -55,7 +55,7 @@ public class SettingsButton extends FrameButton {
 		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.X_AXIS));
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
 
-		Dimension size = new Dimension(80, 25);
+		Dimension size = new Dimension(120, 25);
 
 		JLabel directoryLabel = new JLabel("Default Directory:");
 		directoryLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);

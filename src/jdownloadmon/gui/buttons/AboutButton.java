@@ -41,8 +41,14 @@ public class AboutButton extends FrameButton {
 				"A simple download manager that currently only supports plain http links." +
 				"</center></html>");
 		int fontHeight = progInfo.getFontMetrics(progInfo.getFont()).getHeight();
-		// 30 characters for html tags, 38 is current number of characters that fit on one line.
-		int height = (progInfo.getText().length() - 30) / 38 * fontHeight + fontHeight;
+		int[] fontWidths = progInfo.getFontMetrics(progInfo.getFont()).getWidths();
+		int sum = 0;
+		for (int i : fontWidths) {
+			sum += i;
+		}
+		int fontWidth = sum / fontWidths.length;
+		// 30 characters for html tags.
+		int height = ((progInfo.getText().length() - 30) * fontWidth) / fontHeight + fontHeight;
 		progInfo.setPreferredSize(new Dimension(0, height));
 		progInfo.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
