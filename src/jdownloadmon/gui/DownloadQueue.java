@@ -24,11 +24,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
+import jdownloadmon.DownloadManager.DefaultFileExistsBehavior;
 import jdownloadmon.gui.renderers.ValueRenderer;
 
 /**
@@ -85,6 +87,7 @@ public class DownloadQueue extends JTable implements ActionListener {
 		super.valueChanged(e);
 		mIsAdjusting = e.getValueIsAdjusting();
 	}
+
 	/**
 	 * Sort the table whilst keeping the selections.
 	 * Synchronized to keep the selection intact if multiple threads try to access the selected rows at the same time.
@@ -231,7 +234,20 @@ public class DownloadQueue extends JTable implements ActionListener {
 		Object source = e.getSource();
 		if (source.equals(GUI.INSTANCE.getStartButton())) {
 			for (DownloadView view : views) {
-				view.getDownloadObject().download();
+				DownloadObject object = view.getDownloadObject();
+				DefaultFileExistsBehavior behavior = DownloadManager.INSTANCE.
+						getSettings().getDefaultFileExistsBehavior();
+				if (behavior.equals(DefaultFileExistsBehavior.ASK)
+						&& (object.getStatusState() instanceof InactiveState ||
+						object.getStatusState() instanceof ErrorState)) {
+					if (! object.hasBehavior()) {
+						object.setHasBehavior(true);
+						new AskFrame(view.getFileName(), object);
+					}
+				} else {
+					object.setBehavior(behavior);
+					object.download();
+				}
 			}
 		} else if (source.equals(GUI.INSTANCE.getStopButton())) {
 			for (DownloadView view : views) {

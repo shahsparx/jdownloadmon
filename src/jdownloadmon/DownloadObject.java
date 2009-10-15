@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
+import jdownloadmon.DownloadManager.DefaultFileExistsBehavior;
+
 
 /**
  * A download object represents anything that is being downloaded.
@@ -42,6 +44,10 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	private double mSpeed;
 	/** Keeping track of ETA. */
 	private long mETA;
+	/** File extists behavior. */
+	private DefaultFileExistsBehavior mBehavior;
+	/** Whether the download object is choosing a file exists action or not.*/
+	private boolean mHasBehavior;
 
 	/**
 	 * Construct a download object.
@@ -83,13 +89,13 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 * (i.e making sure the thread that's about to stop accessing a file closes it completely before another opens the same file).
 	 * @see Runnable#run()
 	 */
-	public synchronized void run() {
+	public void run() {
 		DownloadConnection runConnection = null;
 		Timer timer = new Timer();
 		try {
 			// Get a copy of the connection and connect anew to avoid getting the wrong stream or any such strange behaviors.
 			runConnection = mDownloadConnection.getDeepCopy();
-			mDownloadFile = new DownloadFile(mDestination, mDownloadedSize);
+			mDownloadFile = new DownloadFile(mDestination, mDownloadedSize, mBehavior);
 			mDestination = mDownloadFile.getDestination();
 			mDownloadedSize = DownloadFile.getFileLength(mDestination);
 			mSize = runConnection.connect(mDownloadedSize);
@@ -125,7 +131,6 @@ public class DownloadObject implements Runnable, DownloadObservable {
 					}
 
 					notifyListeners(new DownloadProgressEvent(DownloadObject.this));
-
 					mSpeed = 0;
 					mETA = 0;
 				}
@@ -321,5 +326,35 @@ public class DownloadObject implements Runnable, DownloadObservable {
 	 */
 	public void openFile() {
 		mStatusState.openFile();
+	}
+
+	/**
+	 * @return <tt>true</tt> if the destionation file exists, <tt>false</tt> otherwise.
+	 */
+	public boolean fileExists() {
+		return new File(mDestination).exists();
+	}
+
+	/**
+	 * Set file exists behavior for this file.
+	 * @param behavior The behavior to set to.
+	 */
+	public void setBehavior(DefaultFileExistsBehavior behavior) {
+		mBehavior = behavior;
+	}
+
+	/**
+	 * @return <tt>true</tt> if the download is currently choosing behavior, <tt>false</tt> otherwise.
+	 */
+	public boolean hasBehavior() {
+		return mHasBehavior;
+	}
+
+	/**
+	 * Set whether this download is choosing behavior.
+	 * @param b <tt>true</tt> if the download is choosing, <tt>false</tt> otherwise.
+	 */
+	public void setHasBehavior(boolean b) {
+		mHasBehavior = b;
 	}
 }

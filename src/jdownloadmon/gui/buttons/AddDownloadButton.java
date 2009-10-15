@@ -10,9 +10,9 @@ import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import jdownloadmon.URLAlreadyExistsException;
 import jdownloadmon.gui.AddDownloadBox;
+import jdownloadmon.gui.AskFrame;
 import jdownloadmon.gui.DownloadFrame;
 import jdownloadmon.gui.GUI;
-import jdownloadmon.states.ActiveState;
 
 /**
  * The add download button is the button in the add download dialog box and is for
@@ -57,7 +57,15 @@ public class AddDownloadButton extends Button {
 			DownloadObject dO = DownloadManager.INSTANCE.addDownload(mAddDownloadBox.getURLTextField().getText(),
 					mAddDownloadBox.getDirectoryTextField().getText());
 			GUI.INSTANCE.addDownloadObject(dO);
-			dO.changeStatusState(new ActiveState(dO));
+			DownloadManager.DefaultFileExistsBehavior behavior =
+						DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior();
+				if (behavior.equals(DownloadManager.DefaultFileExistsBehavior.ASK) && dO.fileExists()) {
+					new AskFrame(dO.getConnection().getFileName(), dO);
+				} else {
+					dO.setBehavior(behavior);
+					dO.download();
+				}
+			
 			mFrame.dispose();
 		} catch (URLAlreadyExistsException e) {
 			mErrorLabel.setText(e.getMessage());

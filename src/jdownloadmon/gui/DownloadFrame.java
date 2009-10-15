@@ -28,10 +28,12 @@ public class DownloadFrame extends JFrame {
 	}
 
 	/**
-	 * Initialize the download frame. Sets the icon.
+	 * Initialize the download frame with an icon and sets some default variables.
 	 */
 	private void init() {
 		setIconImage(IconStore.INSTANCE.getImageIcon("logo.png").getImage());
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 
 	@Override
