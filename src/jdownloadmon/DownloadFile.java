@@ -3,6 +3,7 @@ package jdownloadmon;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import jdownloadmon.DownloadManager.DefaultFileExistsBehavior;
 
 /**
  * The file handler writes to and reads from files on the hard drive.
@@ -21,20 +22,17 @@ public class DownloadFile {
 	 * @param position The position at which to start writing to local file.
 	 * @throws IOException if position is less than 0 or an I/O error occurs.
 	 */
-	public DownloadFile(String destination, long position) throws IOException {
+	public DownloadFile(String destination, long position, DefaultFileExistsBehavior behavior) throws IOException {
 		mDestination = destination;
 
 		File file = new File(mDestination);
 
 		if (file.exists()) {
-			if (DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior().equals(
-					DownloadManager.DefaultFileExistsBehavior.REPLACE)) {
+			if (behavior.equals(DownloadManager.DefaultFileExistsBehavior.REPLACE)) {
 				// For a new file, reset the position to 0
 				position = 0;
 				file.delete();
-			}
-			if (DownloadManager.INSTANCE.getSettings().getDefaultFileExistsBehavior().equals(
-					DownloadManager.DefaultFileExistsBehavior.RENAME)) {
+			} else if (behavior.equals(DownloadManager.DefaultFileExistsBehavior.RENAME)) {
 				// For a new file, reset the position to 0
 				position = 0;
 				int i = 1;

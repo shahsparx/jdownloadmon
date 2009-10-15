@@ -128,7 +128,6 @@ public class GUI implements DownloadObserver {
 		content.add(bottomButtonsPanel, BorderLayout.SOUTH);
 
 		mFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mFrame.setResizable(false);
 		mFrame.pack();
 		mFrame.setVisible(true);
 

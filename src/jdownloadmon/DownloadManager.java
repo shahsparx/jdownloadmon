@@ -41,13 +41,14 @@ public class DownloadManager implements DownloadObserver {
 	 * Enum for default file exist behaviors.
 	 */
 	public enum DefaultFileExistsBehavior {
-
-		/** Resume the file. */
-		RESUME,
+		/** ASK what to do. */
+		ASK,
 		/** Rename the file. */
 		RENAME,
 		/** Replace the file. */
-		REPLACE;
+		REPLACE,
+		/** Resume the file. */
+		RESUME;
 	}
 
 	/**

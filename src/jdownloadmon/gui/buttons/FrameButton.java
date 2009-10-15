@@ -22,7 +22,6 @@ public abstract class FrameButton extends Button {
 		super(button);
 		mFrame = new DownloadFrame(title);
 		mFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		mFrame.setResizable(false);
 	}
 
 	@Override
